@@ -1,8 +1,14 @@
 # Dependências da demonstração pública no Streamlit Community Cloud.
-# O extrator da origem (psycopg) fica de fora: a demonstração nunca abre banco.
-pydantic>=2.8,<3
-pydantic-settings>=2.4,<3
-PyYAML>=6,<7
-pandas>=2.2,<3
-plotly>=5.24,<7
-streamlit>=1.42,<2
+#
+# O Community Cloud escolhe UM arquivo de dependências, e `uv.lock` teria
+# precedência sobre este — instalando só o grupo padrão, sem o extra do piloto,
+# e a tela do gráfico cairia. Por isso o repositório público não versiona o
+# lock: `pyproject.toml` continua descrevendo o projeto para `uv sync` local, e
+# a versão publicada vem daqui, presa às versões verificadas.
+#
+# `psycopg` fica de fora de propósito: a demonstração nunca abre banco.
+pydantic==2.13.4
+pydantic-settings==2.15.0
+PyYAML==6.0.3
+plotly==6.9.0
+streamlit==1.61.1

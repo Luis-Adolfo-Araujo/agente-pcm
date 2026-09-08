@@ -166,8 +166,10 @@ camada de serviço, as mesmas skills e o mesmo verificador; só a origem do
 snapshot muda.
 
 O arquivo de entrada da demonstração é [`streamlit_app.py`](streamlit_app.py),
-na raiz, e as dependências dela estão em [`requirements.txt`](requirements.txt)
-— sem `psycopg`, porque a demonstração nunca abre banco.
+na raiz, e as dependências publicadas estão em
+[`requirements.txt`](requirements.txt), presas às versões verificadas e sem
+`psycopg`, porque a demonstração nunca abre banco. `pyproject.toml` continua
+descrevendo o projeto para `uv sync` no ambiente local.
 
 ### O dado
 
