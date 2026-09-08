@@ -14,6 +14,7 @@ from typing import Any, cast
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from application.config import load_planning_config
@@ -95,6 +96,26 @@ class FeedbackItemBody(BaseModel):
 class FeedbackBody(BaseModel):
     recorded_by: str = Field(min_length=1)
     items: list[FeedbackItemBody]
+
+
+def _mount_web(app: FastAPI) -> None:
+    """Monta a interface exportada na raiz, quando houver uma para montar.
+
+    Publicar em dois hosts custaria CORS aberto e duas URLs vivas. Com a
+    interface no mesmo endereço da API, o navegador não sai da origem. A
+    montagem vem depois das rotas, então `/api` continua sendo da API.
+
+    Sem a variável, ou apontando para pasta inexistente, nada é montado: a
+    API sobe do mesmo jeito para quem só quer o backend.
+    """
+
+    raw = os.environ.get("MAIA_WEB_DIR", "").strip()
+    if not raw:
+        return
+    directory = Path(raw)
+    if not directory.is_dir():
+        return
+    app.mount("/", StaticFiles(directory=directory, html=True), name="web")
 
 
 def create_app() -> FastAPI:
@@ -242,6 +263,7 @@ def create_app() -> FastAPI:
             raise HTTPException(status_code=409, detail=str(error)) from None
         return {"run_id": bundle.run_id, "format": bundle.format.value, "files": bundle.files}
 
+    _mount_web(app)
     return app
 
 

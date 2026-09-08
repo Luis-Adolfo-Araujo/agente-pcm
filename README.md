@@ -96,6 +96,10 @@ Uma proposta inválida não pode ser aprovada.
 Streamlit multipágina que consome a camada de serviço em processo. O piloto é
 somente leitura: nenhuma tela escreve na Tractian.
 
+Esta é a primeira interface, feita para avaliar as skills uma a uma. A interface
+de programação, com o quadro por executante e por dia, mora em `web/` e conversa
+com a API — é ela que a demonstração pública publica.
+
 ### Preparar
 
 ```bash
@@ -160,16 +164,14 @@ para o roadmap e os gates das próximas fases.
 
 ## Demonstração pública
 
-Uma cópia do piloto roda sobre um mundo fictício para que qualquer pessoa gere
-uma programação sem acesso a dado de cliente. É a mesma interface, a mesma
-camada de serviço, as mesmas skills e o mesmo verificador; só a origem do
-snapshot muda.
+A demonstração é o produto inteiro rodando sobre um mundo fictício: a interface
+de `web/`, a API do piloto e as mesmas skills, o mesmo otimizador e o mesmo
+verificador que atendem um extrato real. Só a origem do snapshot muda.
 
-O arquivo de entrada da demonstração é [`streamlit_app.py`](streamlit_app.py),
-na raiz, e as dependências publicadas estão em
-[`requirements.txt`](requirements.txt), presas às versões verificadas e sem
-`psycopg`, porque a demonstração nunca abre banco. `pyproject.toml` continua
-descrevendo o projeto para `uv sync` no ambiente local.
+Um processo serve tudo. A API monta a interface já exportada na própria raiz,
+então o navegador nunca sai da origem — sem CORS e sem uma segunda URL para
+manter viva. `MAIA_WEB_DIR` é o que liga essa montagem; sem a variável a API
+sobe sozinha, como sempre subiu.
 
 ### O dado
 
@@ -194,18 +196,45 @@ uv run maia-pcm generate-demo-snapshot \
 A mesma semente devolve o mesmo arquivo. `--seed`, `--operations`,
 `--inventory-items` e `--as-of` mudam o mundo; `--tenant` muda o rótulo.
 
-### Rodar a demonstração localmente
+### Subir a demonstração
 
 ```bash
-uv sync --extra dev --extra pilot
-uv run streamlit run streamlit_app.py
+docker build -t maia-demo .
+docker run --rm -p 7860:7860 maia-demo
 ```
 
-O acesso é anônimo de propósito: sobre dado inventado não há o que proteger com
-senha, e a demonstração existe para que a pessoa gere a programação sozinha.
-Sobre dado real nada muda — `MAIA_PILOT_PASSWORD` continua obrigatória, e o
-`streamlit_app.py` só define padrões com `setdefault`, então qualquer variável
-já presente no ambiente prevalece.
+A interface abre em `http://localhost:7860` e a API responde no mesmo endereço,
+sob `/api`. O container carrega apenas Python: o Node vive só no estágio que
+exporta a interface e não sobrevive ao build.
+
+Para desenvolver as duas metades separadas, a API em `http://localhost:8001` e
+a interface em `http://localhost:3001`:
+
+```bash
+MAIA_PILOT_SNAPSHOT_DIR=demo/snapshots \
+  uv run uvicorn --factory api.app:create_app --port 8001
+
+cd web && npm install && NEXT_PUBLIC_API=http://localhost:8001 npm run dev
+```
+
+### Publicar no Hugging Face Spaces
+
+O Space é um repositório Git próprio, com um `README.md` de frontmatter que o
+do GitHub não pode carregar. O envio monta a cópia e troca o arquivo:
+
+```bash
+deploy/space/publish.sh https://huggingface.co/spaces/<usuário>/<space>
+```
+
+Crie o Space com SDK **Docker** e visibilidade pública; o `app_port: 7860` do
+card já corresponde ao que o container expõe.
+
+### O acesso
+
+A demonstração não pede senha: sobre dado inventado não há o que proteger, e
+ela existe para que a pessoa gere a programação sozinha. Sobre dado real nada
+muda — com `MAIA_PILOT_PASSWORD` definida, a API volta a exigir o Bearer em
+toda rota que não seja `/api/health`.
 
 Os executantes aparecem com o identificador cru (`tecnico-07`) porque são
 fictícios: o pseudônimo esconderia um dado que não existe.

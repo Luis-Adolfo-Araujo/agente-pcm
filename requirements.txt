@@ -1,14 +1,10 @@
-# Dependências da demonstração pública no Streamlit Community Cloud.
+# Dependências da demonstração pública: a API do agente servindo a interface.
 #
-# O Community Cloud escolhe UM arquivo de dependências, e `uv.lock` teria
-# precedência sobre este — instalando só o grupo padrão, sem o extra do piloto,
-# e a tela do gráfico cairia. Por isso o repositório público não versiona o
-# lock: `pyproject.toml` continua descrevendo o projeto para `uv sync` local, e
-# a versão publicada vem daqui, presa às versões verificadas.
-#
-# `psycopg` fica de fora de propósito: a demonstração nunca abre banco.
+# Presas às versões verificadas. `psycopg` fica de fora de propósito — a
+# demonstração lê um snapshot congelado e nunca abre banco. O extra `pilot`
+# (Streamlit) também não entra: a interface publicada é a de `web/`.
+fastapi==0.141.1
+uvicorn==0.52.3
 pydantic==2.13.4
 pydantic-settings==2.15.0
 PyYAML==6.0.3
-plotly==6.9.0
-streamlit==1.61.1

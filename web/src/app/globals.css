@@ -1,0 +1,876 @@
+/* --- MAIA · identidade visual SENAI ---
+   Valores retirados do Manual de Marcas do Sistema Indústria (2024), p.8:
+   azul Pantone 293 C #164194, laranja Pantone Orange 021 C #E84910,
+   azul claro Pantone Medium Blue C #008BD2.
+
+   Duas regras que o manual impõe e que governam esta interface:
+
+   1. O mundo SENAI é claro. O manual é fundo branco com blocos de azul chapado,
+      então a interface é clara e o azul é estrutura, não enfeite.
+   2. O laranja é "detalhe" — no manual ele existe só no pingo do "i". Aqui ele tem
+      exatamente uma função: marcar a etapa em que você está. Nenhum estado de erro,
+      alerta ou dado usa laranja; para isso existem tokens próprios, escolhidos para
+      passar em AA sobre branco (o laranja da marca dá 3,73:1 e reprovaria como texto).
+*/
+:root {
+  /* Marca */
+  --senai-azul: #164194;
+  --senai-azul-claro: #008BD2;
+  --senai-laranja: #E84910;
+  --senai-branco: #FEFEFE;
+
+  /* Tinta e papel */
+  --azul-900: #0E1B33;
+  --azul-700: #1B3573;
+  --azul-100: #E4EAF6;
+  --azul-050: #F1F4FA;
+  --cinza-600: #4A5A72;
+  --cinza-300: #B9C6DA;
+  /* Contorno de controle precisa de 3:1 (WCAG 1.4.11); #7C8EAD dá 3,32:1 no branco. */
+  --cinza-400: #7C8EAD;
+  --cinza-200: #D5DEEB;
+
+  --color-bg: #FFFFFF;
+  --color-paper: var(--azul-050);
+  --color-surface: #FFFFFF;
+  --color-surface-raised: var(--azul-050);
+  --color-band: var(--senai-azul);
+  --color-text: var(--azul-900);
+  --color-text-muted: var(--cinza-600);
+  --color-text-heading: var(--azul-900);
+  --color-border: var(--cinza-200);
+  --color-border-strong: var(--cinza-300);
+  --color-border-control: var(--cinza-400);
+  --color-primary: var(--senai-azul);
+  --color-primary-hover: var(--azul-700);
+  --color-on-primary: #FFFFFF;
+  --color-marker: var(--senai-laranja);
+
+  /* Estados: nenhum deles é a cor da marca. */
+  --color-done: #1B7F4B;
+  --color-current: var(--senai-azul);
+  --color-blocked: #B3261E;
+  --color-success: #1B7F4B;
+  --color-warning: #8A4B00;
+  --color-danger: #B3261E;
+  --color-info: var(--senai-azul-claro);
+
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+  --chev-point: 18px;
+  --shadow-sm: 0 1px 2px rgba(14, 27, 51, 0.06);
+  --shadow-md: 0 8px 24px rgba(14, 27, 51, 0.10);
+  --font-display: 'Titillium Web', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  color: var(--color-text-heading);
+  margin: 0;
+  line-height: 1.15;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+a { color: var(--color-primary); }
+
+/* Superfícies do browser que a gente não desenhou mas que vestem a página. */
+::selection { background: rgba(22, 65, 148, 0.16); color: var(--azul-900); }
+:root { accent-color: var(--senai-azul); caret-color: var(--senai-azul); color-scheme: light; }
+* { scrollbar-width: thin; scrollbar-color: var(--cinza-300) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--cinza-300); border-radius: 999px; border: 3px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: var(--cinza-600); background-clip: padding-box; }
+
+:where(button, a, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--senai-azul);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Casca ---------- */
+.shell { display: flex; flex-direction: column; min-height: 100vh; background: var(--color-bg); }
+.shell-main { flex: 1; min-width: 0; padding: var(--space-xl) calc(var(--space-xl) * 1.4); }
+.shell-inner { max-width: 1180px; margin: 0 auto; }
+
+/* ---------- Topbar: assinatura, garantia e o trilho ---------- */
+.topbar { position: sticky; top: 0; z-index: 10; background: var(--color-bg); }
+.topbar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+  padding: var(--space-md) calc(var(--space-xl) * 1.4);
+  border-bottom: 1px solid var(--color-border);
+}
+.brand { display: flex; align-items: center; gap: var(--space-md); }
+.brand-name { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; line-height: 1; color: var(--azul-900); }
+.brand-name span { display: block; font-family: var(--font-sans); font-weight: 400; font-size: .78rem; line-height: 1.4; color: var(--color-text-muted); margin-top: 3px; letter-spacing: 0; }
+
+/* Reserva da assinatura oficial: altura de 36px (redução mínima do manual para
+   desktop) e área de proteção 2x em volta. O SVG oficial entra em /public; até lá
+   o espaço fica marcado, e nunca desenhado à mão. */
+.brand-signature { display: flex; align-items: center; padding-left: var(--space-md); border-left: 1px solid var(--color-border); }
+.brand-signature img { height: 36px; width: auto; display: block; }
+.brand-slot {
+  height: 36px; min-width: 104px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px dashed var(--cinza-300); border-radius: var(--radius-sm);
+  font-size: .68rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--color-text-muted); padding: 0 10px;
+}
+
+.topbar-state { text-align: right; font-size: .82rem; color: var(--color-text-muted); }
+.topbar-state strong { color: var(--color-text); font-weight: 600; }
+.topbar-guarantee { color: var(--color-done); font-size: .82rem; font-weight: 500; }
+
+/* ---------- Trilho: bloco de azul chapado, como o manual usa ---------- */
+.rail-band { position: relative; background: var(--color-band); overflow: hidden; }
+/* O corte diagonal é o gesto da marca atual: o mesmo ângulo do itálico do logotipo. */
+.rail-band::before {
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: -40px; width: 120px;
+  background: var(--senai-azul-claro);
+  transform: skewX(-12deg);
+  opacity: .5;
+}
+.rail {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: end;
+  padding: var(--space-md) calc(var(--space-xl) * 1.4) var(--space-lg);
+  margin: 0;
+  list-style: none;
+}
+.step { min-width: 0; }
+.step + .step { margin-left: calc(var(--chev-point) * -1); }
+.step:has(.chev:focus-visible) { outline: 2px solid #FFFFFF; outline-offset: 3px; border-radius: var(--radius-sm); }
+.chev:focus-visible { outline: none; }
+
+.step-metric {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: .74rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, .82);
+  text-align: center;
+  padding: 0 var(--chev-point) 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.step-metric[data-tone='good'] { color: #A9E7C4; }
+.step-metric[data-tone='bad'] { color: #FFC9C2; }
+.step-metric[data-tone='warn'] { color: #FFD9A8; }
+
+.chev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: 56px;
+  padding: 10px calc(var(--chev-point) + 10px);
+  font: inherit;
+  font-size: .92rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  border: 0;
+  background: rgba(255, 255, 255, .12);
+  color: #FFFFFF;
+  /* A ponta é assimétrica de propósito: acompanha a inclinação do itálico da marca. */
+  clip-path: polygon(0 0, calc(100% - var(--chev-point)) 0, 100% 50%, calc(100% - var(--chev-point)) 100%, 0 100%, var(--chev-point) 50%);
+  transition: background-color .18s ease, color .18s ease;
+}
+.step:first-child .chev {
+  clip-path: polygon(0 0, calc(100% - var(--chev-point)) 0, 100% 50%, calc(100% - var(--chev-point)) 100%, 0 100%);
+  padding-left: var(--space-md);
+}
+.chev-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chev-mark { flex-shrink: 0; display: flex; }
+
+.chev[data-state='done'] { background: rgba(255, 255, 255, .26); color: #FFFFFF; }
+.chev[data-state='current'] { background: #FFFFFF; color: var(--senai-azul); font-weight: 700; font-family: var(--font-display); }
+.chev[data-state='available'] { background: rgba(255, 255, 255, .12); color: rgba(255, 255, 255, .92); }
+.chev[data-state='locked'] { background: rgba(255, 255, 255, .06); color: rgba(255, 255, 255, .62); cursor: not-allowed; }
+.chev:not(:disabled):hover { background: rgba(255, 255, 255, .34); }
+.chev[data-state='current']:hover { background: #FFFFFF; }
+/* O pingo do "i": único lugar onde o laranja da marca aparece. */
+.chev-dot { width: 9px; height: 9px; border-radius: 2px; background: var(--color-marker); flex-shrink: 0; transform: skewX(-12deg); }
+
+/* ---------- Página ---------- */
+.page-head { margin-bottom: var(--space-lg); }
+/* Identificação da origem no lugar de um título de etapa: a tela não é uma escolha,
+   é a ficha do recorte de dados sobre o qual tudo acontece. */
+.page-source { margin-bottom: var(--space-lg); }
+.page-source h1 { font-family: var(--font-display); font-size: 1.45rem; }
+.page-source p { margin: 6px 0 0; }
+.campo-nome { display: block; }
+.campo-uso { display: block; font-size: .8rem; color: var(--color-text-muted); margin-top: 1px; }
+.campo-total { color: var(--color-text-muted); white-space: nowrap; }
+
+/* Cinco colunas em largura automática passam da largura do cartão e jogam a
+   última no scroll horizontal. Aqui a proporção é declarada. */
+.tabela-cobertura { table-layout: fixed; }
+.tabela-cobertura th:nth-child(1), .tabela-cobertura td:nth-child(1) { width: 36%; }
+.tabela-cobertura th:nth-child(2), .tabela-cobertura td:nth-child(2) { width: 24%; }
+.tabela-cobertura th:nth-child(3), .tabela-cobertura td:nth-child(3) { width: 13%; }
+.tabela-cobertura th:nth-child(4), .tabela-cobertura td:nth-child(4) { width: 11%; }
+.tabela-cobertura th:nth-child(5), .tabela-cobertura td:nth-child(5) { width: 16%; }
+/* Em tela estreita a proporção esmagaria as colunas; melhor rolar dentro do
+   contêiner, que já tem overflow e foco de teclado. */
+@media (max-width: 780px) { .tabela-cobertura { min-width: 680px; } }
+.page-title { font-family: var(--font-display); font-size: 2.15rem; }
+.page-lead { color: var(--color-text-muted); margin-top: var(--space-sm); max-width: 62ch; }
+
+/* ---------- Componentes ---------- */
+.ui-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.ui-card + .ui-card { margin-top: var(--space-lg); }
+/* Dentro de um grid quem espaça é o gap: a regra acima vale só para o fluxo vertical. */
+.ui-grid > .ui-card + .ui-card { margin-top: 0; }
+.ui-card-header { padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--color-border-strong); }
+.ui-card-title { font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; color: var(--color-text-heading); }
+.ui-card-content { padding: var(--space-lg); }
+
+.ui-grid { display: grid; gap: var(--space-md); }
+.ui-grid-4 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.ui-grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+.stat { padding: var(--space-md) var(--space-lg); }
+.stat-label { font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--color-text-muted); }
+.stat-value { font-family: var(--font-display); font-weight: 700; font-size: 2rem; color: var(--color-text-heading); margin-top: 2px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.stat-note { font-size: .8rem; color: var(--color-text-muted); }
+.stat[data-tone='warn'] .stat-value { color: var(--color-primary); }
+.stat[data-tone='bad'] .stat-value { color: var(--color-blocked); }
+.stat[data-tone='good'] .stat-value { color: var(--color-done); }
+
+.ui-table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--color-border-strong); }
+.ui-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.ui-table th {
+  text-align: left; padding: 10px 14px;
+  font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--color-text-muted); background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-border-strong); white-space: nowrap;
+}
+.ui-table td { padding: 9px 14px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+/* `.ui-table th` já carrega text-align:left com especificidade maior que `.num`,
+   então o cabeçalho numérico precisa ser dito aqui, ou ele desalinha da coluna. */
+.ui-table th.num { text-align: right; }
+.ui-table td.num, .ui-table th.num { white-space: nowrap; }
+.ui-table tbody tr:last-child td { border-bottom: 0; }
+.ui-table tbody tr:hover { background: var(--azul-050); }
+.ui-table tbody tr[aria-selected='true'] { background: var(--azul-100); box-shadow: inset 3px 0 0 var(--senai-azul); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: .72rem; font-weight: 500; white-space: nowrap;
+  border: 1px solid transparent;
+}
+.badge[data-tone='good'] { color: #12633A; background: #E3F4EA; border-color: #B7DFC8; }
+.badge[data-tone='warn'] { color: var(--color-warning); background: #FDF0DC; border-color: #EBCB9A; }
+.badge[data-tone='bad'] { color: var(--color-blocked); background: #FCE9E7; border-color: #F0BDB7; }
+.badge[data-tone='mute'] { color: var(--color-text-muted); background: var(--azul-050); border-color: var(--color-border); }
+
+.btn {
+  font: inherit; font-weight: 500; cursor: pointer;
+  padding: 9px 18px; border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-control); background: transparent; color: var(--color-text);
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn:hover:not(:disabled) { border-color: var(--color-primary); color: var(--color-primary); background: var(--azul-050); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); font-weight: 600; }
+.btn-primary:hover:not(:disabled) { background: var(--color-primary-hover); border-color: var(--color-primary-hover); color: var(--color-on-primary); }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: .8rem; color: var(--color-text-muted); }
+/* O campo é opcional, e o rótulo precisa dizer isso sem virar outro parágrafo. */
+.field-opcional {
+  font-size: .72rem; color: var(--cinza-400); font-style: italic;
+}
+.field input, .field select, .field textarea {
+  font: inherit; padding: 9px 12px; border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-control); background: #FFFFFF; color: var(--color-text);
+}
+.field input:hover, .field select:hover, .field textarea:hover { border-color: var(--cinza-600); }
+.field textarea { resize: vertical; min-height: 84px; }
+
+.ui-empty { text-align: center; padding: calc(var(--space-xl) * 1.6) var(--space-lg); color: var(--color-text-muted); }
+.ui-empty-title { font-family: var(--font-display); font-size: 1.4rem; color: var(--color-text-heading); }
+.ui-empty-desc { max-width: 46ch; margin: var(--space-sm) auto var(--space-lg); }
+
+.note { border-left: 1px solid var(--color-primary); padding: 12px 16px; background: var(--azul-050); font-size: .88rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.note[data-tone='bad'] { border-left-color: var(--color-blocked); background: #FCE9E7; }
+
+/* Sem piso, a coluna de contribuição espreme a barra até virar um fio numa tela
+   estreita. Com piso, quem cede é a tabela, que já rola dentro do próprio wrap. */
+.bar { height: 6px; min-width: 56px; border-radius: 3px; background: var(--azul-100); overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--senai-azul); }
+.bar[data-tone='bad'] > i { background: var(--color-blocked); }
+
+.mono { font-family: var(--font-mono); font-size: .8rem; color: var(--color-text-muted); word-break: break-all; }
+.row { display: flex; gap: var(--space-md); align-items: flex-end; flex-wrap: wrap; }
+.muted { color: var(--color-text-muted); }
+
+/* ---------- Abas ---------- */
+.tabs { display: flex; gap: var(--space-lg); border-bottom: 1px solid var(--color-border-strong); margin-bottom: var(--space-lg); }
+.tab {
+  font: inherit; background: none; border: 0; cursor: pointer;
+  padding: 0 0 10px; color: var(--color-text-muted);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab[aria-selected='true'] { color: var(--senai-azul); border-bottom-color: var(--senai-azul); font-weight: 700; font-family: var(--font-display); }
+.tab:hover:not([aria-selected='true']) { color: var(--color-text); }
+.tab-count { font-family: var(--font-mono); font-size: .78rem; color: var(--color-text-muted); margin-left: 6px; }
+
+/* ---------- Trace: o funil por skill ---------- */
+.prov { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--space-md) var(--space-lg); padding: var(--space-md) var(--space-lg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-paper); }
+.prov dt { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-muted); }
+.prov dd { margin: 2px 0 0; font-family: var(--font-mono); font-size: .8rem; color: var(--color-text); overflow-wrap: anywhere; }
+
+.trace { list-style: none; margin: var(--space-lg) 0 0; padding: 0; }
+.trace-stage { position: relative; padding-left: var(--space-xl); padding-bottom: var(--space-lg); }
+.trace-stage::before { content: ''; position: absolute; left: 7px; top: 22px; bottom: -6px; width: 1px; background: var(--color-border-strong); }
+.trace-stage:last-child::before { display: none; }
+.trace-stage::after { content: ''; position: absolute; left: 3px; top: 8px; width: 9px; height: 9px; border-radius: 2px; background: var(--senai-azul); transform: skewX(-12deg); }
+.trace-stage[data-skill='true']::after { background: var(--senai-azul-claro); }
+.trace-stage[data-pendente='true']::after { background: var(--cinza-300); }
+.trace-head { display: flex; align-items: baseline; gap: var(--space-sm); flex-wrap: wrap; }
+.trace-name { font-family: var(--font-display); font-weight: 700; color: var(--color-text-heading); }
+.trace-time { font-size: .78rem; font-weight: 600; color: var(--senai-azul); font-variant-numeric: tabular-nums; }
+.trace-counts { font-size: .78rem; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+.trace-body { margin-top: var(--space-sm); }
+.trace-nested { list-style: none; margin: var(--space-md) 0 0; padding: 0; }
+
+.dist { display: flex; width: 100%; height: 28px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--color-border); }
+.dist-seg { border: 0; padding: 0; cursor: pointer; min-width: 3px; transition: filter .15s ease; }
+.dist-seg:hover { filter: brightness(1.25); }
+.dist-seg[aria-pressed='true'] { box-shadow: inset 0 0 0 2px var(--azul-900); }
+.dist-legend { display: flex; flex-wrap: wrap; gap: 6px var(--space-md); margin-top: var(--space-sm); font-size: .8rem; }
+.dist-key { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-muted); }
+.dist-key i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.dist-key b { font-weight: 600; color: var(--color-text); font-variant-numeric: tabular-nums; }
+
+.trace-json { margin-top: var(--space-sm); }
+.trace-json summary { cursor: pointer; font-size: .8rem; color: var(--color-text-muted); }
+.trace-json pre { font-family: var(--font-mono); font-size: .74rem; background: var(--azul-050); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-md); overflow-x: auto; color: var(--azul-900); }
+
+/* ---------- Respiro em telas estreitas ---------- */
+@media (max-width: 1000px) {
+  .shell-main { padding: var(--space-lg) var(--space-lg); }
+  .topbar-head, .rail { padding-left: var(--space-lg); padding-right: var(--space-lg); }
+}
+
+@media (max-width: 780px) {
+  .rail {
+    grid-auto-columns: minmax(150px, 1fr);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: var(--space-sm);
+  }
+  .step { scroll-snap-align: start; }
+  .topbar-state { text-align: left; }
+  .page-title { font-size: 1.7rem; }
+  .ui-grid-4 { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .ui-grid-2 { grid-template-columns: 1fr; }
+  .stat-value { font-size: 1.6rem; }
+}
+
+@media (max-width: 480px) {
+  .shell-main { padding: var(--space-md) var(--space-md); }
+  .topbar-head, .rail { padding-left: var(--space-md); padding-right: var(--space-md); }
+  .ui-card-content { padding: var(--space-md); }
+  .ui-grid-4 { grid-template-columns: 1fr 1fr; }
+  .tabs { gap: var(--space-md); }
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Semana por dia ---------- */
+.trilho-dias {
+  display: flex; gap: 8px; margin-bottom: var(--space-lg);
+  overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity;
+}
+.chip-dia {
+  flex: 0 0 auto; scroll-snap-align: start;
+  font: inherit; cursor: pointer; text-align: center;
+  min-width: 118px; padding: 10px 16px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  background: var(--color-paper); color: var(--color-text);
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.chip-dia:hover:not([data-estado='ativo']) { border-color: var(--cinza-400); }
+.chip-dia[data-estado='ativo'] {
+  background: var(--senai-azul); border-color: var(--senai-azul); color: #FFFFFF;
+}
+.chip-dia[data-estado='vazio'] { opacity: .72; }
+.chip-dia-nome { display: block; font-family: var(--font-display); font-weight: 700; font-size: .95rem; }
+.chip-dia-nota { display: block; font-size: .72rem; font-variant-numeric: tabular-nums; color: var(--color-text-muted); margin-top: 2px; }
+.chip-dia[data-estado='ativo'] .chip-dia-nota { color: rgba(255, 255, 255, .82); }
+
+/* O chip de dia também recebe cartão: mover de dia é arrastar até ele. */
+.chip-dia[data-alvo='sim'] { border-color: var(--senai-azul); box-shadow: inset 0 0 0 1px var(--senai-azul); }
+.popover-remanejo {
+  max-width: 420px; margin: var(--space-sm) 0 var(--space-md);
+  background: var(--color-surface); border: 1px solid var(--senai-azul);
+  border-radius: var(--radius-md); padding: 12px;
+  box-shadow: 0 8px 24px rgba(14, 27, 51, .18);
+  display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.popover-remanejo .note { font-size: .74rem; padding: 8px 10px; }
+.movida-nota {
+  display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap;
+  margin: 0 0 var(--space-md); font-size: .82rem; color: var(--color-text-muted);
+}
+
+/* --- Quadro do dia: uma coluna por pessoa, um cartão por ordem --- */
+.quadro {
+  display: flex; gap: var(--space-md); align-items: stretch;
+  overflow-x: auto; overflow-y: hidden;
+  height: clamp(420px, 62vh, 780px);
+  padding-bottom: var(--space-sm);
+}
+.coluna {
+  position: relative;
+  flex: 0 0 260px; display: flex; flex-direction: column; min-height: 0;
+  background: var(--color-paper); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.coluna-cabeca {
+  padding: 10px 12px; background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.coluna-nome { font-family: var(--font-mono); font-size: .8rem; color: var(--color-text); }
+.coluna-carga { font-size: .74rem; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+.coluna-marcas { display: flex; flex-wrap: wrap; gap: 4px; }
+.coluna-corpo {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 10px; display: flex; flex-direction: column; gap: 8px;
+}
+.coluna-vazia { font-size: .76rem; color: var(--color-text-muted); text-align: center; margin: var(--space-md) 0; }
+.cartao {
+  display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); padding: 8px 10px; cursor: pointer;
+  font: inherit; color: inherit;
+}
+.cartao:hover { border-color: var(--cinza-400); }
+.cartao[data-ativa='sim'] { border-color: var(--senai-azul); box-shadow: inset 0 0 0 1px var(--senai-azul); }
+.cartao-hora {
+  font-family: var(--font-mono); font-size: .74rem; color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.cartao-titulo {
+  font-size: .85rem; line-height: 1.3;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+.cartao-rodape {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: .72rem; color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.cartao-score { margin-left: auto; color: var(--senai-azul); font-weight: 500; }
+.cartao-antes { margin-left: 6px; color: var(--color-warning); }
+.cartao-slot { cursor: grab; }
+.cartao-slot:active { cursor: grabbing; }
+.cartao-slot[data-arrastando='sim'] { opacity: .4; }
+.cartao-slot[data-insercao='sim'] { box-shadow: 0 -2px 0 var(--senai-azul); }
+.coluna[data-alvo='sim'] { border-color: var(--senai-azul); box-shadow: inset 0 0 0 1px var(--senai-azul); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao, .coluna { transition: none; }
+}
+
+/* O lote de sequência pendente, uma linha por pessoa remexida. */
+.quadro-rodape { margin-top: var(--space-md); display: flex; flex-direction: column; gap: var(--space-sm); }
+.pendencia {
+  border: 1px solid var(--color-border-strong); border-radius: var(--radius-md);
+  padding: 10px 12px; background: var(--color-surface);
+}
+/* A troca pergunta em cima da coluna que recebeu o cartão: o destino é o lugar. */
+.popover-troca {
+  position: absolute; z-index: 5; top: 8px; left: 8px; right: 8px;
+  background: var(--color-surface); border: 1px solid var(--senai-azul);
+  border-radius: var(--radius-md); padding: 12px;
+  box-shadow: 0 8px 24px rgba(14, 27, 51, .18);
+  display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.popover-titulo { margin: 0; font-size: .82rem; font-family: var(--font-mono); }
+.popover-nota { margin: 0; font-size: .72rem; color: var(--color-text-muted); }
+.popover-troca .note { font-size: .74rem; padding: 8px 10px; }
+.popover-acoes { display: flex; gap: var(--space-sm); justify-content: flex-end; }
+
+.pendencia-resumo { font-size: .8rem; color: var(--color-text-muted); margin-bottom: 10px; }
+.pendencia-campos {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto auto;
+  gap: var(--space-sm); align-items: end;
+}
+@media (max-width: 720px) {
+  .pendencia-campos { grid-template-columns: minmax(0, 1fr); }
+}
+
+
+/* A linha é a pessoa inteira num relance: nome, quanto do dia está tomado, e o
+   que precisa de atenção. O dia ordem a ordem mora no modal. */
+@media (hover: hover) {
+}
+.carga { height: 6px; border-radius: 3px; background: var(--azul-100); overflow: hidden; }
+.carga > i { display: block; height: 100%; background: var(--senai-azul); }
+.carga[data-estourou='sim'] > i { background: var(--color-blocked); }
+
+/* ---------- Modal de detalhe ---------- */
+/* Fechada, a caixa é só a lista. Ao abrir uma ordem ela cresce para caber a
+   coluna do lado — e continua centrada nos dois estados, então o crescimento é
+   simétrico e a janela nunca fica encostada numa borda. */
+.modal {
+  --m-fechado: min(92vw, 480px);
+  --m-aberto: min(94vw, 1180px);
+  padding: 0; border: 0; background: transparent; color: var(--color-text);
+  max-width: none; max-height: none; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.modal:not([open]) { display: none; }
+.modal::backdrop { background: rgba(14, 27, 51, .52); }
+.modal[open] .modal-caixa { animation: modal-entra 200ms cubic-bezier(.16, 1, .3, 1); }
+.modal[open]::backdrop { animation: modal-fundo 200ms ease-out; }
+@keyframes modal-entra { from { opacity: 0; transform: translateY(10px); } }
+@keyframes modal-fundo { from { opacity: 0; } }
+
+.modal-caixa {
+  display: flex; flex-direction: column;
+  width: var(--m-fechado);
+  /* Altura fixa, não conteúdo: as duas colunas rolam por conta própria, e a
+     caixa para de pular quando o corpo encolhe. */
+  height: min(88vh, 900px);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: 0 18px 48px rgba(14, 27, 51, .28);
+  transition: width 280ms cubic-bezier(.16, 1, .3, 1);
+}
+.modal-caixa[data-expandido='sim'] { width: var(--m-aberto); }
+
+/* O topo é bloco de azul chapado, como a faixa do trilho: no manual o azul é
+   estrutura, e é ele que diz de quem ou de que ordem esta janela está falando. */
+.modal-topo { background: var(--color-band); color: #FFFFFF; padding: var(--space-md) var(--space-lg); }
+.modal-titulo-linha { display: flex; align-items: flex-start; gap: var(--space-md); }
+/* Os títulos de OS da origem chegam com laudo inteiro dentro. Duas linhas dizem
+   qual ordem é esta; o resto fica no title e no corpo. */
+.modal-titulo {
+  flex: 1; min-width: 0; color: #FFFFFF;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.32rem; line-height: 1.25;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+.modal-fechar {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 30px; height: 30px; margin: -3px -6px 0 0;
+  border: 0; border-radius: var(--radius-sm); cursor: pointer;
+  background: rgba(255, 255, 255, .14); color: #FFFFFF;
+  transition: background-color .15s ease;
+}
+.modal-fechar:hover { background: rgba(255, 255, 255, .3); }
+.modal-nota { font-size: .82rem; color: rgba(255, 255, 255, .84); font-variant-numeric: tabular-nums; }
+.modal-topo .badge[data-tone='good'] { color: #FFFFFF; background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .34); }
+.modal-topo .badge[data-tone='warn'],
+.modal-topo .badge[data-tone='bad'] { color: var(--azul-900); background: #FFD9A8; border-color: #FFD9A8; }
+
+.modal-fechar:focus-visible { outline-color: #FFFFFF; }
+
+.modal-corpo { flex: 1; min-height: 0; padding: var(--space-lg); overflow-y: auto; overscroll-behavior: contain; }
+
+/* ---------- Lista à esquerda, ordem aberta ao lado ---------- */
+.detalhe-pane { min-width: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-lg); }
+.detalhe-titulo {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height: 1.3;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+}
+.detalhe-marcas { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; margin: 8px 0 var(--space-lg); }
+.detalhe-nota { font-size: .82rem; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+/* Só existe quando a coluna da lista some, embaixo de 900px. */
+.voltar-lista { display: none; margin-bottom: var(--space-md); }
+
+/* Na coluna estreita da esquerda, a linha da ordem é hora em cima e nome embaixo. */
+.modal-corpo > .tabs { margin-top: 0; }
+
+/* ---------- Barra da sequência ---------- */
+
+/* ---------- Ficha da ordem ---------- */
+.ficha {
+  /* 210 e não 170: o número da OS tem 24 dígitos, e numa coluna estreita ele
+     quebra no meio — um identificador partido em duas linhas não se copia. */
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-md); margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-paper); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+}
+.ficha dt { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-muted); }
+.ficha dd {
+  margin: 3px 0 0; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
+  color: var(--color-text-heading); font-variant-numeric: tabular-nums;
+}
+.ficha .ficha-mono { font-family: var(--font-mono); font-size: .86rem; font-weight: 500; overflow-wrap: anywhere; }
+.ficha-nota { display: block; font-family: var(--font-sans); font-weight: 400; font-size: .78rem; color: var(--color-text-muted); margin-top: 2px; }
+
+.secao + .secao { margin-top: var(--space-xl); }
+.secao-titulo { font-size: .95rem; margin-bottom: 10px; }
+.marca-atual {
+  display: inline-block; margin-left: 8px; font-family: var(--font-sans);
+  font-size: .7rem; color: var(--senai-azul); font-weight: 600;
+}
+
+.btn-menor { padding: 5px 12px; font-size: .82rem; }
+
+.tabela-clicavel tbody tr { cursor: pointer; }
+
+/* ---------- Trilha de uma ordem ---------- */
+.trilha { margin-top: 0; }
+.trilha .trace-stage:last-child { padding-bottom: 0; }
+.trilha-evidencia {
+  list-style: none; margin: 6px 0 0; padding: 0;
+  font-size: .84rem; color: var(--color-text-muted);
+}
+.trilha-evidencia li + li { margin-top: 2px; }
+.trilha-codigos {
+  margin: 6px 0 0; font-family: var(--font-mono); font-size: .72rem;
+  color: var(--color-text-muted); overflow-wrap: anywhere;
+}
+
+/* ---------- Passar a ordem para outra pessoa ---------- */
+/* Vista inteira da gaveta: sem moldura de cartão, que aqui só seria caixa dentro
+   de caixa. As ações ficam ancoradas no fim do corpo, depois dos avisos. */
+.troca-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-md); }
+.troca-acoes { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: var(--space-lg); }
+
+/* ---------- As ordens de um dia, dentro do modal ---------- */
+
+/* A linha carrega a posição no dia à esquerda e a pega de arraste à direita; o
+   cartão no meio continua sendo o botão que abre a ordem. */
+@media (hover: hover) {
+}
+
+/* Sem largura para duas colunas, a lista vira a vista anterior e a ordem ocupa
+   tudo — com a volta que no desktop não precisa existir. */
+@media (max-width: 900px) {
+  .modal { --m-fechado: 100vw; --m-aberto: 100vw; }
+  .modal-caixa, .modal-caixa[data-expandido='sim'] { width: 100vw; height: 100%; border-radius: 0; }
+  .voltar-lista { display: inline-flex; }
+}
+
+@media (max-width: 780px) {
+  .carga { grid-column: 1 / -1; }
+  .modal-corpo { padding: var(--space-md); }
+}
+
+/* --- Matriz da semana: uma linha por pessoa, uma coluna por dia ---
+   A leitura é a barra de ocupação, e o número anda sempre com ela: "sem escala"
+   e "0%" desenhariam o mesmo trilho vazio, e a cor sozinha não pode separar os
+   dois. O verde e o vermelho são os tokens de estado — o laranja da marca não
+   entra aqui, ele é o pingo do chevron e nada mais. */
+.matriz-caixa { display: flex; flex-direction: column; gap: var(--space-sm); }
+.matriz-acoes {
+  display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap;
+  font-size: .78rem;
+}
+.matriz-rolagem {
+  overflow: auto; max-height: 72vh;
+  border: 1px solid var(--color-border-strong); border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.matriz-rolagem:focus-visible { outline: 2px solid var(--senai-azul); outline-offset: 2px; }
+.matriz { border-collapse: separate; border-spacing: 0; width: 100%; }
+
+/* O cabeçalho e a coluna da esquerda ficam parados: com quarenta linhas, quem
+   rola perde de vista de quem e de que dia a barra está falando. */
+.matriz thead th {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-border-strong);
+  padding: 0; text-align: left; vertical-align: bottom;
+}
+.matriz-canto {
+  left: 0; z-index: 4;
+  padding: 10px 12px !important;
+  border-right: 1px solid var(--color-border-strong);
+  min-width: 232px;
+}
+.canto-titulo {
+  display: block; font-family: var(--font-display); font-weight: 600; font-size: .86rem;
+  color: var(--color-text-heading);
+}
+.canto-total {
+  display: block; font-size: .72rem; color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums; margin-top: 2px;
+}
+.matriz-dia { min-width: 156px; }
+.dia-abrir {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  background: none; border: 0; padding: 10px 12px; color: inherit; font: inherit;
+}
+.dia-abrir:hover .dia-nome { color: var(--senai-azul); }
+.dia-abrir:focus-visible { outline: 2px solid var(--senai-azul); outline-offset: -2px; }
+.dia-nome {
+  display: block; font-family: var(--font-display); font-weight: 600; font-size: .84rem;
+  color: var(--color-text-heading); text-transform: capitalize;
+}
+.dia-ocupacao {
+  display: block; font-size: .74rem; color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums; margin-top: 2px;
+}
+
+.matriz-linha > th, .matriz-linha > td {
+  border-bottom: 1px solid var(--color-border); vertical-align: top;
+}
+.matriz-pessoa {
+  position: sticky; left: 0; z-index: 2;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border-strong);
+  padding: 8px 12px; text-align: left; font-weight: 400;
+}
+.matriz-linha[data-aberta='sim'] > .matriz-pessoa { background: var(--color-paper); }
+.pessoa-abrir {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  background: none; border: 0; padding: 0; cursor: pointer; color: inherit; text-align: left;
+}
+.pessoa-abrir:focus-visible { outline: 2px solid var(--senai-azul); outline-offset: 2px; }
+.pessoa-chevron { flex: none; color: var(--color-text-muted); transform: rotate(-90deg); }
+.matriz-linha[data-aberta='sim'] .pessoa-chevron { transform: none; color: var(--senai-azul); }
+.pessoa-nome {
+  font-family: var(--font-mono); font-size: .78rem; color: var(--color-text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pessoa-abrir:hover .pessoa-nome { color: var(--senai-azul); }
+.pessoa-semana { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.pessoa-semana .ocupacao { flex: 1; }
+.pessoa-nota {
+  font-size: .7rem; color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums; margin-top: 3px;
+}
+
+.matriz-celula { position: relative; padding: 8px 12px; }
+.celula-medida {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: none; border: 0; padding: 0; cursor: pointer; color: inherit;
+}
+.celula-medida:focus-visible { outline: 2px solid var(--senai-azul); outline-offset: 2px; }
+.celula-medida .ocupacao { flex: 1; }
+
+/* O trilho pontilhado é o dia sem jornada declarada: nada pode ser dito sobre a
+   ocupação dele, e um trilho cheio de 0% diria que sobrou folga. */
+.ocupacao {
+  height: 8px; border-radius: 4px; background: var(--azul-100); overflow: hidden;
+  min-width: 24px;
+}
+.ocupacao > i { display: block; height: 100%; background: var(--senai-azul); }
+.ocupacao-num {
+  font-size: .74rem; font-variant-numeric: tabular-nums; color: var(--color-text-muted);
+  min-width: 4ch; text-align: right;
+}
+.matriz-celula[data-estado='sem-escala'] .ocupacao {
+  background: none; border: 1px dashed var(--cinza-300); height: 8px;
+}
+.matriz-celula[data-estado='ocioso'] .ocupacao-num { color: var(--cinza-400); }
+.matriz-celula[data-estado='cheio'] .ocupacao > i { background: var(--color-done); }
+.matriz-celula[data-estado='cheio'] .ocupacao-num { color: var(--color-done); font-weight: 500; }
+.matriz-celula[data-estado='estourou'] .ocupacao > i { background: var(--color-blocked); }
+.matriz-celula[data-estado='estourou'] .ocupacao-num { color: var(--color-blocked); font-weight: 600; }
+.pessoa-semana[data-estourou='sim'] .ocupacao > i { background: var(--color-blocked); }
+.pessoa-semana[data-estourou='sim'] .ocupacao-num { color: var(--color-blocked); font-weight: 600; }
+
+.matriz-celula[data-alvo='sim'] { box-shadow: inset 0 0 0 2px var(--senai-azul); }
+.celula-cartoes { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.celula-vazia {
+  margin: 8px 0 0; font-size: .7rem; color: var(--cinza-400); font-style: italic;
+}
+
+/* Dentro da matriz o popover entra no fluxo: a caixa de rolagem cortaria uma
+   camada absoluta, e a linha crescer é o que mostra onde o cartão caiu. */
+.matriz-celula .popover-troca, .matriz-celula .popover-remanejo {
+  position: static; margin: 8px 0 0; width: auto; max-width: none;
+}
+.matriz-celula:has(.popover-troca), .matriz-celula:has(.popover-remanejo) { min-width: 300px; }
+.popover-destino {
+  margin: 0; font-size: .78rem; color: var(--color-text);
+  background: var(--color-paper); border-radius: var(--radius-sm); padding: 8px 10px;
+}
+
+/* --- Filtros da matriz --- */
+.filtros {
+  display: flex; align-items: flex-end; gap: var(--space-md); flex-wrap: wrap;
+  padding: 12px; margin-bottom: var(--space-sm);
+  background: var(--color-paper); border-radius: var(--radius-md);
+}
+.filtro-busca { min-width: 220px; flex: 1 1 220px; }
+.filtro-local { min-width: 160px; }
+.filtro-estouro {
+  background: var(--color-surface); border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-md); padding: 7px 12px; font: inherit; font-size: .82rem;
+  color: var(--color-text); cursor: pointer;
+}
+.filtro-estouro:hover { border-color: var(--senai-azul); color: var(--senai-azul); }
+.filtro-estouro[aria-pressed='true'] {
+  background: var(--senai-azul); border-color: var(--senai-azul); color: var(--color-on-primary);
+  font-weight: 600;
+}
+.filtro-resultado {
+  margin: 0; font-size: .78rem; color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.filtro-aviso {
+  flex-basis: 100%; margin: 0; font-size: .72rem; color: var(--color-text-muted);
+}
+.btn-lapis {
+  background: none; border: 0; padding: 0; font: inherit; font-size: inherit;
+  color: var(--senai-azul); cursor: pointer; text-decoration: underline;
+}
+
+@media (max-width: 780px) {
+  .matriz-canto, .matriz-pessoa { min-width: 156px; }
+  .matriz-rolagem { max-height: 66vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pessoa-chevron { transition: none; }
+}
