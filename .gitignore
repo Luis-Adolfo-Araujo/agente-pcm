@@ -20,3 +20,4 @@ docs/design/interface-piloto-maia.html
 # Artefatos da demonstração pública; o snapshot fica versionado, as runs não.
 var/demo/
 
+var/

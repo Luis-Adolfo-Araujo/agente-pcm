@@ -7,6 +7,7 @@ import { Decidir } from '@/components/stages/Decidir';
 import { Montar } from '@/components/stages/Montar';
 import { Semana } from '@/components/stages/Semana';
 import { EmptyState } from '@/components/ui';
+import { asset } from '@/lib/caminhos';
 import {
   ApiError,
   BASE,
@@ -57,13 +58,13 @@ function Assinatura() {
   useEffect(() => {
     const teste = new window.Image();
     teste.onload = () => setTemArquivo(true);
-    teste.src = '/senai.svg';
+    teste.src = asset('/senai.svg');
   }, []);
 
   return (
     <div className="brand-signature">
       {temArquivo ? (
-        <img src="/senai.svg" alt="SENAI" />
+        <img src={asset('/senai.svg')} alt="SENAI" />
       ) : (
         <span className="brand-slot" title="Coloque o SVG oficial em public/senai.svg">
           assinatura senai · 36px

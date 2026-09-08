@@ -1,3 +1,5 @@
+import { demoApi } from '@/lib/demo';
+
 export const BASE = process.env.NEXT_PUBLIC_API ?? 'http://localhost:8000';
 const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN ?? '';
 
@@ -159,7 +161,14 @@ export type FeedbackRecord = FeedbackItem & {
   feedback_id: string; run_id: string; snapshot_id: string; recorded_by: string; recorded_at: string;
 };
 
-export const api = {
+/**
+ * Na demonstração pública não há API atrás da página: os artefatos foram
+ * gerados uma vez pelo agente e viajam como arquivo estático. A tela não
+ * sabe da diferença — as duas implementações têm a mesma forma.
+ */
+const DEMONSTRACAO = (process.env.NEXT_PUBLIC_DEMO ?? '') === '1';
+
+const apiHttp = {
   snapshots: () => get<Snapshot[]>('/api/snapshots'),
   runs: () => get<Run[]>('/api/runs'),
   run: (id: string) => get<Run>(`/api/runs/${id}`),
@@ -173,6 +182,8 @@ export const api = {
   feedback: (id: string, body: { recorded_by: string; items: FeedbackItem[] }) =>
     post<FeedbackRecord[]>(`/api/runs/${id}/feedback`, body),
 };
+
+export const api = DEMONSTRACAO ? demoApi : apiHttp;
 
 /** Quem está mexendo. Perguntar a cada troca seria pedágio; o piloto é de uma pessoa por vez. */
 const CHAVE_QUEM = 'maia.quem';

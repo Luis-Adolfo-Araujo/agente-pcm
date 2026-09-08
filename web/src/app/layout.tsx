@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import './fonts.css';
+import { asset } from '@/lib/caminhos';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -14,6 +14,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
+      <head>
+        {/* Fora do empacotamento de propósito: ver public/fonts.css. */}
+        <link rel="stylesheet" href={asset('/fonts.css')} />
+      </head>
       <body>{children}</body>
     </html>
   );

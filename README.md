@@ -164,14 +164,13 @@ para o roadmap e os gates das próximas fases.
 
 ## Demonstração pública
 
-A demonstração é o produto inteiro rodando sobre um mundo fictício: a interface
-de `web/`, a API do piloto e as mesmas skills, o mesmo otimizador e o mesmo
-verificador que atendem um extrato real. Só a origem do snapshot muda.
+A interface de programação, publicada como página estática, sobre uma planta
+que não existe: <https://luis-adolfo-araujo.github.io/agente-pcm/>
 
-Um processo serve tudo. A API monta a interface já exportada na própria raiz,
-então o navegador nunca sai da origem — sem CORS e sem uma segunda URL para
-manter viva. `MAIA_WEB_DIR` é o que liga essa montagem; sem a variável a API
-sobe sozinha, como sempre subiu.
+Ela serve para olhar e ajustar a tela — o chevron das etapas, o quadro por
+executante e por dia, a explicação de por que cada ordem entrou ou ficou de
+fora. Não há servidor atrás: a rodada já aconteceu, feita pelo agente de
+verdade, e as respostas viajam como arquivo.
 
 ### O dado
 
@@ -186,29 +185,33 @@ devolve 469 ordens programadas, 529 sem capacidade, 138 sem material e 64
 bloqueadas — as quatro saídas que o PCM precisa distinguir, em vez de uma semana
 folgada onde tudo entra.
 
-Para regerar o arquivo, ou para produzir outra planta:
-
 ```bash
+# refaz a planta; a mesma semente devolve o mesmo arquivo
 uv run maia-pcm generate-demo-snapshot \
   --output demo/snapshots/demo-planta-modelo.json
+
+# congela uma rodada do agente como os JSON que a página lê
+uv run python scripts/gerar_artefatos_demo.py
 ```
 
-A mesma semente devolve o mesmo arquivo. `--seed`, `--operations`,
-`--inventory-items` e `--as-of` mudam o mundo; `--tenant` muda o rótulo.
+Os artefatos saem do próprio cliente HTTP da API, não de um molde escrito à
+mão: o que a página lê tem a forma exata que um servidor devolveria. Se o
+contrato mudar, quebra aqui.
 
-### Subir a demonstração
+### Publicar a página
 
 ```bash
-docker build -t maia-demo .
-docker run --rm -p 7860:7860 maia-demo
+web/publicar.sh
 ```
 
-A interface abre em `http://localhost:7860` e a API responde no mesmo endereço,
-sob `/api`. O container carrega apenas Python: o Node vive só no estágio que
-exporta a interface e não sobrevive ao build.
+Constrói e empurra para o branch `gh-pages`. O Pages serve um repositório de
+projeto sob `/<repositório>/`, então o build recebe esse subcaminho em
+`PAGES_BASE_PATH`, e `NEXT_PUBLIC_DEMO=1` liga o modo sem servidor.
 
-Para desenvolver as duas metades separadas, a API em `http://localhost:8001` e
-a interface em `http://localhost:3001`:
+### A mesma tela contra a API de verdade
+
+A interface não sabe se está na demonstração. Sem `NEXT_PUBLIC_DEMO`, ela fala
+HTTP com a API do piloto:
 
 ```bash
 MAIA_PILOT_SNAPSHOT_DIR=demo/snapshots \
@@ -217,23 +220,13 @@ MAIA_PILOT_SNAPSHOT_DIR=demo/snapshots \
 cd web && npm install && NEXT_PUBLIC_API=http://localhost:8001 npm run dev
 ```
 
-### Publicar no Hugging Face Spaces
-
-O Space é um repositório Git próprio, com um `README.md` de frontmatter que o
-do GitHub não pode carregar. O envio monta a cópia e troca o arquivo:
-
-```bash
-deploy/space/publish.sh https://huggingface.co/spaces/<usuário>/<space>
-```
-
-Crie o Space com SDK **Docker** e visibilidade pública; o `app_port: 7860` do
-card já corresponde ao que o container expõe.
+`MAIA_WEB_DIR` faz a API montar a interface já exportada na própria raiz, se
+você preferir um endereço só.
 
 ### O acesso
 
-A demonstração não pede senha: sobre dado inventado não há o que proteger, e
-ela existe para que a pessoa gere a programação sozinha. Sobre dado real nada
-muda — com `MAIA_PILOT_PASSWORD` definida, a API volta a exigir o Bearer em
+A página não pede senha: sobre dado inventado não há o que proteger. Sobre dado
+real nada muda — com `MAIA_PILOT_PASSWORD` definida, a API exige o Bearer em
 toda rota que não seja `/api/health`.
 
 Os executantes aparecem com o identificador cru (`tecnico-07`) porque são
