@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #2F7D6D; } a:hover { color: #173F38; }
+  </style>
+</helmet>
+<div style="width: 900px; height: 800px; box-sizing: border-box; background: #FAFAF8; color: #1A1A18; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; padding: 44px 48px; display: flex; flex-direction: column; gap: 30px;">
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #2F7D6D;">Piloto MAIA · PCM Planta Modelo</div>
+    <div style="font-size: 31px; font-weight: 640; letter-spacing: -0.02em; line-height: 1.15;">Três direções para a interface</div>
+    <div style="font-size: 15px; color: #55554E; max-width: 640px; line-height: 1.5;">Rascunhos de estrutura, não de acabamento. Escolha a direção e a alta fidelidade vem depois.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px; border: 1px solid #E4E4DC; border-radius: 6px; padding: 20px 22px; background: #FFFFFF;">
+    <div style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8A80;">O que trava hoje</div>
+    <div style="display: flex; flex-direction: column; gap: 9px; font-size: 14px; line-height: 1.5;">
+      <div style="display: flex; gap: 10px;"><span style="color: #B4463C; font-weight: 700;">1</span><span>A porta de entrada é uma tabela de qualidade de dados. Diagnóstico é o que se consulta <em>depois</em> de desconfiar de um resultado, não o primeiro contato.</span></div>
+      <div style="display: flex; gap: 10px;"><span style="color: #B4463C; font-weight: 700;">2</span><span>Dez itens de navegação em lista chapada, sem ordem nem indicação de onde você está no processo.</span></div>
+      <div style="display: flex; gap: 10px;"><span style="color: #B4463C; font-weight: 700;">3</span><span>Nenhuma ação primária visível. Nada na tela diz o que fazer agora.</span></div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8A80;">As direções</div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="border: 1px solid #E4E4DC; border-left: 4px solid #2F7D6D; border-radius: 5px; padding: 16px 18px; background: #FFFFFF; display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; font-weight: 700; color: #2F7D6D;">A</span>
+          <span style="font-size: 17px; font-weight: 620;">Assistente por etapas</span>
+        </div>
+        <div style="font-size: 13.5px; color: #55554E; line-height: 1.5;">O processo vira um caminho numerado com uma ação por vez. Ataca de frente o &ldquo;não sei por onde começar&rdquo;.</div>
+        <div style="font-size: 12.5px; color: #8A6A2A; line-height: 1.45;"><strong>Custo:</strong> atrapalha quem já sabe o caminho e só quer pular para a semana.</div>
+      </div>
+
+      <div style="border: 1px solid #E4E4DC; border-left: 4px solid #2F7D6D; border-radius: 5px; padding: 16px 18px; background: #FFFFFF; display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; font-weight: 700; color: #2F7D6D;">B</span>
+          <span style="font-size: 17px; font-weight: 620;">Painel de decisão</span>
+        </div>
+        <div style="font-size: 13.5px; color: #55554E; line-height: 1.5;">Abre na proposta da semana. Os diagnósticos viram aprofundamento, não pré-requisito.</div>
+        <div style="font-size: 12.5px; color: #8A6A2A; line-height: 1.45;"><strong>Custo:</strong> esconde a qualidade dos dados, que o plano exige visível antes de interpretar o resultado.</div>
+      </div>
+
+      <div style="border: 1px solid #E4E4DC; border-left: 4px solid #2F7D6D; border-radius: 5px; padding: 16px 18px; background: #FFFFFF; display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; font-weight: 700; color: #2F7D6D;">C</span>
+          <span style="font-size: 17px; font-weight: 620;">Bancada do planejador</span>
+        </div>
+        <div style="font-size: 13.5px; color: #55554E; line-height: 1.5;">Uma lista densa de operações com filtros e painel lateral. Fala a língua da planilha que o PCM já usa.</div>
+        <div style="font-size: 12.5px; color: #8A6A2A; line-height: 1.45;"><strong>Custo:</strong> ótima para quem opera todo dia, fraca para o avaliador de primeira viagem — que é o público do piloto.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: auto; border-top: 1px dashed #D4D4CA; padding-top: 14px; font-size: 12.5px; color: #8A8A80; line-height: 1.5;">
+    As três cabem no Streamlit com esforço diferente. B e C precisam de componente próprio para a grade da semana; A é a mais barata de construir.
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

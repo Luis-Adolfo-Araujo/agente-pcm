@@ -1,0 +1,1 @@
+# como as respostas de API são reduzidas

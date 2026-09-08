@@ -1,0 +1,1 @@
+# este usuário pode acionar esta ferramenta?

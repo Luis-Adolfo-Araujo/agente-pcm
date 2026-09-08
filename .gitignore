@@ -1,0 +1,22 @@
+.venv/
+.env
+.streamlit/secrets.toml
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.py[cod]
+planning-output/
+var/pilot/
+
+# Canvas de design gerado; as fontes .dc.html ficam versionadas
+docs/design/interface-piloto-maia.html
+.superpowers/
+
+# App web
+../maia-web/node_modules/
+../maia-web/.next/
+
+# Artefatos da demonstração pública; o snapshot fica versionado, as runs não.
+var/demo/
+

@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #2F7D6D; } a:hover { color: #173F38; }
+    .wf-box { border: 1.5px dashed #C8C8BE; border-radius: 4px; background: #FFFFFF; }
+    .wf-label { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #9A9A90; }
+    .cell { font-size: 12.5px; padding: 8px 10px; border-bottom: 1px solid #EFEFE8; }
+    .head { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #9A9A90; padding: 8px 10px; border-bottom: 1.5px solid #DCE5E2; }
+  </style>
+</helmet>
+<div style="width: 1280px; height: 820px; box-sizing: border-box; background: #FAFAF8; color: #1A1A18; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; display: flex; flex-direction: column;">
+
+  <div style="padding: 14px 28px; border-bottom: 1px solid #E4E4DC; display: flex; align-items: center; gap: 14px; background: #FFFFFF;">
+    <div style="font-weight: 700; font-size: 15px; color: #173F38;">MAIA</div>
+    <div style="font-size: 13px; color: #8A8A80;">Backlog · 18–25 ago</div>
+    <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+      <div style="border: 1px solid #DCE5E2; border-radius: 5px; padding: 6px 14px; font-size: 12.5px; color: #55554E;">Exportar CSV</div>
+      <div style="background: #2F7D6D; color: #FFF; border-radius: 5px; padding: 6px 16px; font-size: 12.5px; font-weight: 620;">Gerar semana</div>
+    </div>
+  </div>
+
+  <div style="padding: 20px 28px 12px; display: flex; flex-direction: column; gap: 4px;">
+    <div class="wf-label" style="color: #2F7D6D;">Direção C — Bancada do planejador</div>
+    <div style="font-size: 24px; font-weight: 640; letter-spacing: -0.015em;">Tudo numa lista, do jeito que a planilha já é</div>
+  </div>
+
+  <div style="padding: 0 28px; display: grid; grid-template-columns: 190px minmax(0, 1fr) 260px; gap: 16px; flex-grow: 1;">
+
+    <div class="wf-box" style="padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+      <div class="wf-label">Filtros</div>
+      <div style="display: flex; flex-direction: column; gap: 9px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px;"><div style="width: 13px; height: 13px; border: 1.5px solid #2F7D6D; border-radius: 3px; background: #2F7D6D;"></div><span>Vencidas <span style="color: #9A9A90;">(412)</span></span></div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px;"><div style="width: 13px; height: 13px; border: 1.5px solid #C8C8BE; border-radius: 3px;"></div><span>Vencem na semana <span style="color: #9A9A90;">(88)</span></span></div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px;"><div style="width: 13px; height: 13px; border: 1.5px solid #C8C8BE; border-radius: 3px;"></div><span>Bloqueadas <span style="color: #9A9A90;">(74)</span></span></div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px;"><div style="width: 13px; height: 13px; border: 1.5px solid #C8C8BE; border-radius: 3px;"></div><span>Programadas <span style="color: #9A9A90;">(469)</span></span></div>
+      </div>
+      <div style="border-top: 1px dashed #D4D4CA; padding-top: 14px; display: flex; flex-direction: column; gap: 9px;">
+        <div class="wf-label">Prioridade</div>
+        <div style="display: flex; gap: 6px;">
+          <div style="border: 1px solid #2F7D6D; background: #F2F7F5; color: #2F7D6D; border-radius: 4px; padding: 5px 11px; font-size: 12px; font-weight: 620;">1</div>
+          <div style="border: 1px solid #DCE5E2; border-radius: 4px; padding: 5px 11px; font-size: 12px; color: #55554E;">2</div>
+          <div style="border: 1px solid #DCE5E2; border-radius: 4px; padding: 5px 11px; font-size: 12px; color: #55554E;">3</div>
+          <div style="border: 1px solid #DCE5E2; border-radius: 4px; padding: 5px 11px; font-size: 12px; color: #55554E;">4</div>
+        </div>
+      </div>
+      <div style="border-top: 1px dashed #D4D4CA; padding-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+        <div class="wf-label">Material</div>
+        <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12.5px; color: #55554E;">
+          <div>Disponível <span style="color: #9A9A90;">(39)</span></div>
+          <div>Sem informação <span style="color: #9A9A90;">(3.243)</span></div>
+          <div>Bloqueador <span style="color: #9A9A90;">(2)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-box" style="display: flex; flex-direction: column; overflow: hidden;">
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 2.4fr) 52px 60px 74px 74px; background: #FCFCFA;">
+        <div class="head">#</div><div class="head">Operação</div><div class="head">Score</div><div class="head">Prior.</div><div class="head">SLA</div><div class="head">Material</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 2.4fr) 52px 60px 74px 74px; background: #F2F7F5;">
+        <div class="cell" style="color: #9A9A90;">1</div><div class="cell" style="font-weight: 620;">Inspecionar redutor da linha 3</div><div class="cell" style="font-weight: 620;">94</div><div class="cell">1</div><div class="cell" style="color: #B4463C;">−12 d</div><div class="cell" style="color: #8A6A2A;">?</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 2.4fr) 52px 60px 74px 74px;">
+        <div class="cell" style="color: #9A9A90;">2</div><div class="cell">Trocar rolamento do exaustor</div><div class="cell" style="font-weight: 620;">91</div><div class="cell">1</div><div class="cell" style="color: #B4463C;">−8 d</div><div class="cell" style="color: #2F7D6D;">OK</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 2.4fr) 52px 60px 74px 74px;">
+        <div class="cell" style="color: #9A9A90;">3</div><div class="cell">Corrigir vazamento na bomba 12</div><div class="cell" style="font-weight: 620;">88</div><div class="cell">2</div><div class="cell" style="color: #B4463C;">−5 d</div><div class="cell" style="color: #8A6A2A;">?</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 2.4fr) 52px 60px 74px 74px;">
+        <div class="cell" style="color: #9A9A90;">4</div><div class="cell">Manutenção na roda de apoio</div><div class="cell" style="font-weight: 620;">84</div><div class="cell">2</div><div class="cell">3 d</div><div class="cell" style="color: #8A6A2A;">?</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 2.4fr) 52px 60px 74px 74px;">
+        <div class="cell" style="color: #9A9A90;">5</div><div class="cell">Substituir carrinhos estragados</div><div class="cell" style="font-weight: 620;">79</div><div class="cell">2</div><div class="cell">9 d</div><div class="cell" style="color: #B4463C;">falta</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 2.4fr) 52px 60px 74px 74px;">
+        <div class="cell" style="color: #9A9A90;">6</div><div class="cell">Revisar painel MCA da balança</div><div class="cell" style="font-weight: 620;">71</div><div class="cell">3</div><div class="cell">14 d</div><div class="cell" style="color: #8A6A2A;">?</div>
+      </div>
+      <div style="padding: 14px 12px; font-size: 12px; color: #9A9A90;">… 3.278 linhas</div>
+    </div>
+
+    <div class="wf-box" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 14px;">
+      <div class="wf-label">Detalhe da linha</div>
+      <div style="font-size: 14px; font-weight: 620; line-height: 1.35;">Inspecionar redutor da linha 3</div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="wf-label">Por que está no topo</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px;"><span style="color: #55554E;">SLA vencido</span><span style="font-weight: 620;">+40</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px;"><span style="color: #55554E;">Prioridade 1</span><span style="font-weight: 620;">+35</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px;"><span style="color: #55554E;">Idade 48 dias</span><span style="font-weight: 620;">+19</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px;"><span style="color: #9A9A90;">Criticidade</span><span style="color: #9A9A90;">não informada</span></div>
+        </div>
+      </div>
+
+      <div style="border-top: 1px dashed #D4D4CA; padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div class="wf-label">Duração</div>
+        <div style="font-size: 12.5px; color: #55554E; line-height: 1.45;">90 min adotada · P50 80 / P80 120<br>7 execuções no mesmo ativo</div>
+      </div>
+
+      <div style="border-top: 1px dashed #D4D4CA; padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div class="wf-label">Executantes sugeridos</div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px;">
+          <div style="display: flex; justify-content: space-between;"><span>Técnico-4A2F</span><span style="color: #2F7D6D; font-weight: 620;">78</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>Técnico-9C11</span><span style="color: #55554E;">64</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="height: 26px;"></div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

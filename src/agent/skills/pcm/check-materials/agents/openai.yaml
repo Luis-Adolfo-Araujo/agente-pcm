@@ -1,0 +1,4 @@
+interface:
+  display_name: "Disponibilidade de materiais"
+  short_description: "Verifica materiais, saldo, reserva e prazo"
+  default_prompt: "Use $check-materials para avaliar a prontidão de materiais das ordens."

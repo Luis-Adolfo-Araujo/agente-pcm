@@ -1,0 +1,12 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 900, "h": 800, "title": "Brief e direções" },
+    { "file": "DirecaoA.dc.html", "x": 980, "y": 0, "w": 1280, "h": 820, "title": "A · Assistente por etapas" },
+    { "file": "DirecaoB.dc.html", "x": 2340, "y": 0, "w": 1280, "h": 820, "title": "B · Painel de decisão" },
+    { "file": "DirecaoC.dc.html", "x": 3700, "y": 0, "w": 1280, "h": 820, "title": "C · Bancada do planejador" }
+  ],
+  "annotations": [
+    { "id": "escolha", "x": 0, "y": -150, "w": 420, "text": "Escolha uma direção.\nA alta fidelidade vem depois — estes são rascunhos de estrutura." }
+  ],
+  "launch": { "view": "canvas" }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tratamento de notas"
+  short_description: "Tria duplicidade, tipo e prioridade de notas"
+  default_prompt: "Use $treat-notes para triar um lote de notas antes da criação das ordens."

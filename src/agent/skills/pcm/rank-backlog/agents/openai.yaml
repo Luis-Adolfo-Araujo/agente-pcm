@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ranking do backlog"
+  short_description: "Prioriza ordens por risco, idade e SLA"
+  default_prompt: "Use $rank-backlog para calcular um ranking explicável das ordens do backlog."

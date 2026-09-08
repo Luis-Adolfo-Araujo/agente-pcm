@@ -1,0 +1,1 @@
+# o que atravessão sessões (começa vazio)

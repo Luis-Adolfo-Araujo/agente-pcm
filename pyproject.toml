@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "maia-pcm-agent"
+version = "0.1.0"
+description = "Agente Programador de PCM com skills determinísticas e aprovação humana"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.8,<3",
+  "pydantic-settings>=2.4,<3",
+  "PyYAML>=6,<7",
+  "psycopg[binary]>=3.2,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "hypothesis>=6.100",
+  "mypy>=1.11",
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.6",
+  "types-PyYAML>=6.0",
+]
+optimizer = ["ortools>=9.11"]
+api = ["fastapi>=0.115", "uvicorn>=0.30", "httpx2>=0.28"]
+pilot = [
+  "pandas>=2.2,<3",
+  "plotly>=5.24,<7",
+  "streamlit>=1.42,<2",
+]
+
+[project.scripts]
+maia-pcm = "application.cli:main"
+maia-pcm-pilot = "presentation.launcher:main"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/agent",
+  "src/application",
+  "src/domain",
+  "src/infrastructure",
+  "src/presentation",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Depends() em default de argumento é o idioma do FastAPI, não um descuido.
+"src/api/*.py" = ["B008"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]

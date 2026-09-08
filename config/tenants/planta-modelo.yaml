@@ -1,0 +1,39 @@
+ranking:
+  priority_scores:
+    1: 100
+    2: 75
+    3: 50
+    4: 25
+  priority_weight: 0.35
+  age_weight: 0.25
+  sla_weight: 0.40
+  criticality_weight: 0.20
+  age_cap_days: 90
+  sla_horizon_days: 45
+  overdue_cap_days: 45
+
+duration:
+  prefer_planned: true
+  minimum_sample_size: 3
+  maximum_valid_minutes: 1440
+  default_minutes: 60
+  title_similarity_threshold: 0.45
+
+materials:
+  consider_expected_inbound: true
+  allow_partial: false
+  # Uma OS sem material cadastrado indica diagnóstico pendente ou item sem
+  # saldo, nunca dispensa de material. Ativar bloqueia a programação dessas OS.
+  block_unregistered_material: false
+
+executants:
+  top_n: 5
+  team_weight: 20
+  asset_weight: 30
+  activity_weight: 25
+  location_weight: 15
+  frequency_weight: 10
+
+optimizer:
+  algorithm_version: greedy-v1
+  slot_granularity_minutes: 15

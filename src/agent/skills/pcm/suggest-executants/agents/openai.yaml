@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sugestão de executantes"
+  short_description: "Ordena executantes elegíveis por evidências"
+  default_prompt: "Use $suggest-executants para indicar candidatos elegíveis e disponíveis para cada operação."

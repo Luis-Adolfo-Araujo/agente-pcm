@@ -1,0 +1,4 @@
+interface:
+  display_name: "Capacidade de manutenção"
+  short_description: "Calcula capacidade líquida por executante"
+  default_prompt: "Use $calculate-capacity para calcular os slots líquidos de capacidade da equipe."

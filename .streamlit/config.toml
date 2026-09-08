@@ -1,0 +1,86 @@
+# Sistema visual do piloto MAIA.
+#
+# Fundamento: o quadro de programação de manutenção — painel pautado de linhas
+# por executante e colunas por dia — e a borda do vidro float, verde por causa
+# do óxido de ferro. Daí vêm as réguas em vez de cartões, o raio zero e o verde
+# reservado à fase corrente e à ação primária.
+
+[theme]
+base = "light"
+
+# vidro: fundo, o tom do vidro plano sob luz do norte
+backgroundColor = "#EDF1EF"
+# papel: superfície de leitura
+secondaryBackgroundColor = "#FBFCFC"
+# tinta: texto, preto com fundo verde
+textColor = "#10201D"
+# borda: o verde da borda cortada do vidro. Só fase corrente e ação primária.
+primaryColor = "#0B6B58"
+linkColor = "#0B6B58"
+borderColor = "#CBD6D2"
+showWidgetBorder = true
+
+# O quadro era pautado, não era cartão flutuante.
+baseRadius = "0.15rem"
+buttonRadius = "0.15rem"
+
+font = "Plex Sans"
+headingFont = "Archivo Condensed"
+codeFont = "Plex Mono"
+baseFontSize = 15
+headingFontWeights = [600, 600, 600, 600, 600, 600]
+
+# óxido para atraso e bloqueio, verde para o que está pronto
+chartCategoricalColors = ["#0B6B58", "#A4442A", "#5E706B", "#8FA8A0", "#C89B3C", "#3E5C55"]
+
+[theme.sidebar]
+backgroundColor = "#E3E9E6"
+secondaryBackgroundColor = "#EDF1EF"
+borderColor = "#C3D0CB"
+font = "Plex Sans"
+headingFont = "Archivo Condensed"
+
+[[theme.fontFaces]]
+family = "Archivo Condensed"
+url = "app/static/fonts/ArchivoCondensed-SemiBold.woff2"
+weight = 600
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Plex Sans"
+url = "app/static/fonts/PlexSans-Regular.woff2"
+weight = 400
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Plex Sans"
+url = "app/static/fonts/PlexSans-Medium.woff2"
+weight = 500
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Plex Sans"
+url = "app/static/fonts/PlexSans-SemiBold.woff2"
+weight = 600
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Plex Mono"
+url = "app/static/fonts/PlexMono-Regular.woff2"
+weight = 400
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Plex Mono"
+url = "app/static/fonts/PlexMono-Medium.woff2"
+weight = 500
+style = "normal"
+
+[server]
+headless = true
+runOnSave = false
+maxUploadSize = 25
+enableStaticServing = true
+
+[browser]
+gatherUsageStats = false

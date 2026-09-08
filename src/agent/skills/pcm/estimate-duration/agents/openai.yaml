@@ -1,0 +1,4 @@
+interface:
+  display_name: "Estimativa de duração"
+  short_description: "Estima duração com evidência histórica"
+  default_prompt: "Use $estimate-duration para estimar a duração de operações com confiança e evidências."

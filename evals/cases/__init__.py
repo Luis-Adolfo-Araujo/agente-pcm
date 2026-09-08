@@ -1,0 +1,1 @@
+# cenários com estado inicial e critério

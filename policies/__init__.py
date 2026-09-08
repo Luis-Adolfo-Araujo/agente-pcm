@@ -1,0 +1,1 @@
+# L — política como artefato versionado
