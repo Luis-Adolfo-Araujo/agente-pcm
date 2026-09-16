@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { aplicarTrocas, motivoDoFeedback, trocaDaOrdem, trocasNoConjunto, type Troca } from '@/lib/trocas';
+import { motivoDoFeedback, trocaDaOrdem, trocasNoConjunto, type Troca } from '@/lib/trocas';
 import { carga, escalaDoDia, escalaImpossivel, indexar } from '@/lib/semana';
 import type { Assignment, Backlog, Capacity, Schedule } from '@/lib/api';
 
@@ -30,47 +30,6 @@ function semana(assignments: Assignment[]): Schedule {
 const troca = (over: Partial<Troca> = {}): Troca => ({
   operation_id: 'op-1', de: 'ana', para: 'bruno', motivo: 'conhece o ativo',
   em: '2026-08-19T10:00:00-03:00', ...over,
-});
-
-describe('aplicarTrocas', () => {
-  it('devolve o mesmo objeto quando não há troca, para não invalidar memo à toa', () => {
-    const base = semana([alocacao('op-1', ['ana'], '2026-08-19T08:00:00-03:00', '2026-08-19T09:00:00-03:00')]);
-    expect(aplicarTrocas(base, [])).toBe(base);
-  });
-
-  it('troca só o executante indicado e preserva o resto da alocação', () => {
-    const base = semana([alocacao('op-1', ['ana'], '2026-08-19T08:00:00-03:00', '2026-08-19T09:00:00-03:00')]);
-    const [depois] = aplicarTrocas(base, [troca()]).assignments;
-    expect(depois.worker_ids).toEqual(['bruno']);
-    expect(depois.window).toEqual(base.assignments[0].window);
-    expect(depois.priority_score).toBe(70);
-  });
-
-  it('não mexe nas ordens que não foram trocadas', () => {
-    const base = semana([
-      alocacao('op-1', ['ana'], '2026-08-19T08:00:00-03:00', '2026-08-19T09:00:00-03:00'),
-      alocacao('op-2', ['ana'], '2026-08-19T09:00:00-03:00', '2026-08-19T10:00:00-03:00'),
-    ]);
-    const depois = aplicarTrocas(base, [troca()]).assignments;
-    expect(depois[0].worker_ids).toEqual(['bruno']);
-    expect(depois[1]).toBe(base.assignments[1]);
-  });
-
-  it('preserva os outros executantes de uma ordem feita a quatro mãos', () => {
-    const base = semana([alocacao('op-1', ['ana', 'carla'], '2026-08-19T08:00:00-03:00', '2026-08-19T09:00:00-03:00')]);
-    expect(aplicarTrocas(base, [troca()]).assignments[0].worker_ids).toEqual(['bruno', 'carla']);
-  });
-
-  it('ignora uma troca cuja origem não está mais na ordem', () => {
-    const base = semana([alocacao('op-1', ['carla'], '2026-08-19T08:00:00-03:00', '2026-08-19T09:00:00-03:00')]);
-    expect(aplicarTrocas(base, [troca()]).assignments[0]).toBe(base.assignments[0]);
-  });
-
-  it('não altera o schedule original', () => {
-    const base = semana([alocacao('op-1', ['ana'], '2026-08-19T08:00:00-03:00', '2026-08-19T09:00:00-03:00')]);
-    aplicarTrocas(base, [troca()]);
-    expect(base.assignments[0].worker_ids).toEqual(['ana']);
-  });
 });
 
 describe('leitura das trocas', () => {

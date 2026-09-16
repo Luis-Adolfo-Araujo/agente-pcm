@@ -5,21 +5,22 @@ import { Quadro } from '@/components/quadro/Quadro';
 import { PopoverRemanejo, type DestinoDoDia } from '@/components/quadro/PopoverRemanejo';
 import type { useArraste } from '@/components/quadro/useArraste';
 import type { useReordens } from '@/components/sessao/useReordens';
-import type { useRemanejos } from '@/components/sessao/useRemanejos';
-import type { Pedido } from '@/components/sessao/useTrocas';
-import type { Assignment, Backlog, Run, Schedule } from '@/lib/api';
+import type { Pedido, Remanejador } from '@/components/sessao/useRevisao';
+import type { Assignment, Backlog, Causa, Run, Schedule } from '@/lib/api';
 import {
   carga, diaDe, diasDoPeriodo, escalaDoDia, horas, minutosDe, rotuloDia, tecnicosComEscala,
 } from '@/lib/semana';
 import { colunasDoDia } from '@/lib/quadro';
 import { inicioNoDia } from '@/lib/remanejos';
+import type { MarcasDaRevisao } from '@/lib/revisao';
 import type { Troca } from '@/lib/trocas';
 
 /** Um cartão solto num chip do trilho, esperando quem recebe e a que horas. */
 type PedidoDeDia = { operationId: string; deTecnico: string; paraDia: string };
 
 export function PorDia({
-  run, schedule, base, backlog, trocas, titulos, ativa, onAbrirOrdem,
+  run, schedule, base, backlog, trocas, titulos, ativa, onAbrirOrdem, onTirarDaSemana,
+  indisponiveis, onMarcarIndisponivel, marcas,
   dia: diaEscolhido, onMudarDia, arraste,
   reordenacao, remanejo, trocar, gravando, erro, limparErro,
 }: {
@@ -34,13 +35,21 @@ export function PorDia({
   /** A ordem aberta no modal, para o cartão dela ficar marcado. */
   ativa: string | null;
   onAbrirOrdem: (operationId: string) => void;
+  /** Abre a prévia de tirar a ordem da semana. */
+  onTirarDaSemana: (operationId: string) => void;
+  /** Incluídas e durações alteradas, para as marcas do cartão. */
+  marcas: MarcasDaRevisao;
+  /** Quem está indisponível em cada dia, por técnico. */
+  indisponiveis: Map<string, Map<string, Causa>>;
+  /** Abre a prévia de marcar alguém como indisponível. */
+  onMarcarIndisponivel: (tecnico: string, dia: string) => void;
   /** O dia aberto. Vazio significa "escolha por mim": o primeiro com trabalho. */
   dia: string;
   onMudarDia: (dia: string) => void;
   /** O arraste em curso, o mesmo da matriz semanal. */
   arraste: ReturnType<typeof useArraste>;
   reordenacao: ReturnType<typeof useReordens>;
-  remanejo: ReturnType<typeof useRemanejos>;
+  remanejo: Remanejador;
   trocar: (pedido: Pedido) => Promise<boolean>;
   gravando: boolean;
   erro: string | null;
@@ -76,8 +85,10 @@ export function PorDia({
 
   const doDia = useMemo(() => porDia.get(dia) ?? [], [porDia, dia]);
   const pessoas = useMemo(
-    () => colunasDoDia(schedule.assignments, backlog.capacities, dia, trocas, remanejo.remanejos).length,
-    [schedule, backlog, dia, trocas, remanejo.remanejos],
+    () => colunasDoDia(
+      schedule.assignments, backlog.capacities, dia, trocas, remanejo.remanejos, indisponiveis,
+    ).length,
+    [schedule, backlog, dia, trocas, remanejo.remanejos, indisponiveis],
   );
 
   const ordemDoPedido = pedido
@@ -223,6 +234,10 @@ export function PorDia({
             titulos={titulos}
             ativa={ativa}
             onAbrirOrdem={onAbrirOrdem}
+            onTirarDaSemana={onTirarDaSemana}
+            indisponiveis={indisponiveis}
+            onMarcarIndisponivel={onMarcarIndisponivel}
+            marcas={marcas}
             arraste={arraste}
             reordenacao={reordenacao}
             trocar={trocar}

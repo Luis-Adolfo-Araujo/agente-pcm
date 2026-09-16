@@ -88,7 +88,7 @@ export function PopoverTroca({
 
       <p className="popover-nota">
         A ordem mantém o horário dela e entra pelo relógio. Para mudar a posição, arraste dentro
-        da coluna. Isto não reescreve a proposta: grava a sua discordância.
+        da coluna. Grava um ajuste na revisão e a sua discordância, que é o que o agente aprende.
       </p>
 
       {erro && <div className="note" data-tone="bad">{erro}</div>}

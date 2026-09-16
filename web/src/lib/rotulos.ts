@@ -1,4 +1,5 @@
 /** Os nomes que o backend usa não são nomes de gente. Aqui é onde eles viram. */
+import type { Causa, TipoDeAjuste } from '@/lib/api';
 
 export const FONTE: Record<string, string> = {
   planned: 'duração planejada da OS',
@@ -68,4 +69,35 @@ export const STATUS_PLANEJAMENTO: Record<string, string> = {
   planned: 'Já planejada na origem',
   awaiting_scheduling: 'Aguardando programação',
   without_planning: 'Sem planejamento previsto',
+};
+
+/** Singular e plural de cada tipo de ajuste, para as contagens da tela. */
+export const TIPO_DE_AJUSTE: Record<TipoDeAjuste, [string, string]> = {
+  unavailable: ['indisponibilidade', 'indisponibilidades'],
+  include: ['inclusão', 'inclusões'],
+  move: ['movimento', 'movimentos'],
+  remove: ['tirada da semana', 'tiradas da semana'],
+  duration: ['duração alterada', 'durações alteradas'],
+};
+
+/** Por que a cascata propôs cada consequência, na voz de quem revisa. */
+export const CONSEQUENCIA: Record<string, string> = {
+  SAME_DAY_OTHER_CANDIDATE: 'mesmo dia, com outro candidato do agente que tinha folga',
+  OTHER_DAY_OTHER_CANDIDATE: 'outro dia, com um candidato do agente que tinha folga',
+  NO_CANDIDATE_WITH_ROOM: 'nenhum candidato do agente tem folga no período',
+  FILLS_FREED_WINDOW: 'cabe no horário que ficou livre',
+  MAKES_ROOM_FOR_INCLUDED: 'prioridade menor que a da ordem incluída',
+  PUSHED_BY_LONGER_DURATION: 'empurrada pela duração maior da ordem anterior',
+  PAST_SHIFT_END: 'empurrada, passaria do fim da escala',
+};
+
+export const NOTA_DA_CASCATA: Record<string, string> = {
+  DOES_NOT_FIT_EVEN_REMOVING_LOWER:
+    'Não cabe nem tirando as ordens de menor prioridade do dia: a ordem entra estourando a escala.',
+};
+
+export const CAUSA: Record<Causa, string> = {
+  vacation: 'férias',
+  sick_leave: 'atestado',
+  other: 'indisponível',
 };

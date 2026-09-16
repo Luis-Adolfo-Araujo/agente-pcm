@@ -5,12 +5,13 @@ import type { useArraste } from '@/components/quadro/useArraste';
 import { BarraSequencia, type Pendencia } from '@/components/quadro/BarraSequencia';
 import { PopoverTroca } from '@/components/quadro/PopoverTroca';
 import type { useReordens } from '@/components/sessao/useReordens';
-import type { Pedido } from '@/components/sessao/useTrocas';
+import type { Pedido } from '@/components/sessao/useRevisao';
 import { colunasDoDia, inserirPeloRelogio } from '@/lib/quadro';
 import { mover, mudancas, ordensDoDia, reordenacaoDe, trocasDePosicao } from '@/lib/reordenar';
 import { minutosDe } from '@/lib/semana';
-import type { Backlog, Schedule } from '@/lib/api';
+import type { Backlog, Causa, Schedule } from '@/lib/api';
 import type { Remanejo } from '@/lib/remanejos';
+import type { MarcasDaRevisao } from '@/lib/revisao';
 import type { Troca } from '@/lib/trocas';
 
 /** Uma troca desenhada pelo arraste, ainda não gravada. */
@@ -27,7 +28,8 @@ type PedidoDeTroca = { operationId: string; de: string; para: string; duracao: n
  * pessoa, e aí para e pergunta: a troca só aparece na tela depois de gravada.
  */
 export function Quadro({
-  dia, schedule, base, backlog, trocas, remanejos, titulos, ativa, onAbrirOrdem,
+  dia, schedule, base, backlog, trocas, remanejos, titulos, ativa, onAbrirOrdem, onTirarDaSemana,
+  indisponiveis, onMarcarIndisponivel, marcas,
   arraste, reordenacao, trocar, gravando, erro, limparErro,
 }: {
   dia: string;
@@ -41,6 +43,14 @@ export function Quadro({
   titulos: Map<string, string>;
   ativa: string | null;
   onAbrirOrdem: (operationId: string) => void;
+  /** Abre a prévia de tirar a ordem da semana. */
+  onTirarDaSemana: (operationId: string) => void;
+  /** Incluídas e durações alteradas, para as marcas do cartão. */
+  marcas: MarcasDaRevisao;
+  /** Quem está indisponível em cada dia, por técnico. */
+  indisponiveis: Map<string, Map<string, Causa>>;
+  /** Abre a prévia de marcar alguém como indisponível. */
+  onMarcarIndisponivel: (tecnico: string, dia: string) => void;
   /** O arraste em curso, compartilhado com o trilho de dias. */
   arraste: ReturnType<typeof useArraste>;
   reordenacao: ReturnType<typeof useReordens>;
@@ -56,8 +66,8 @@ export function Quadro({
   const trilho = useRef<HTMLDivElement>(null);
 
   const colunas = useMemo(
-    () => colunasDoDia(schedule.assignments, backlog.capacities, dia, trocas, remanejos),
-    [schedule, backlog, dia, trocas, remanejos],
+    () => colunasDoDia(schedule.assignments, backlog.capacities, dia, trocas, remanejos, indisponiveis),
+    [schedule, backlog, dia, trocas, remanejos, indisponiveis],
   );
 
   /** O horário que cada ordem do dia tinha antes de a sequência ser remexida. */
@@ -81,7 +91,12 @@ export function Quadro({
         ordensDoDia(schedule, coluna.tecnico, dia),
       );
       const decididas = trocasDePosicao(remexidas);
-      return { tecnico: coluna.tecnico, decididas, empurradas: remexidas.length - decididas.length };
+      return {
+        tecnico: coluna.tecnico,
+        decididas,
+        remexidas,
+        empurradas: remexidas.length - decididas.length,
+      };
     })
     .filter((pendencia) => pendencia.decididas.length > 0),
   [colunas, base, schedule, dia, reordenacao]);
@@ -155,11 +170,11 @@ export function Quadro({
     const indice = colunas.findIndex((c) => c.tecnico === tecnico);
     if (event.key === 'ArrowUp') { event.preventDefault(); sequenciar(tecnico, posicao, posicao - 1); }
     if (event.key === 'ArrowDown') { event.preventDefault(); sequenciar(tecnico, posicao, posicao + 1); }
-    if (event.key === 'ArrowLeft' && indice > 0) {
+    if (event.key === 'ArrowLeft' && indice > 0 && !colunas[indice - 1].indisponivel) {
       event.preventDefault();
       pedirTroca(operationId, tecnico, colunas[indice - 1].tecnico);
     }
-    if (event.key === 'ArrowRight' && indice < colunas.length - 1) {
+    if (event.key === 'ArrowRight' && indice < colunas.length - 1 && !colunas[indice + 1].indisponivel) {
       event.preventDefault();
       pedirTroca(operationId, tecnico, colunas[indice + 1].tecnico);
     }
@@ -218,6 +233,9 @@ export function Quadro({
               />
             ) : null}
             onAbrirOrdem={onAbrirOrdem}
+            onTirarDaSemana={onTirarDaSemana}
+            onMarcarIndisponivel={() => onMarcarIndisponivel(coluna.tecnico, dia)}
+            marcas={marcas}
             onArrastarInicio={(operationId, posicao) => {
               arraste.comecar(operationId, coluna.tecnico, posicao);
             }}
@@ -233,13 +251,13 @@ export function Quadro({
 
       <BarraSequencia
         pendencias={pendencias}
-        gravando={reordenacao.gravando}
-        erro={reordenacao.erro}
+        gravando={reordenacao.gravando || gravando}
+        erro={erro}
         onDesfazer={(tecnico) => reordenacao.desfazer(tecnico, dia)}
         onRegistrar={(tecnico, quem, motivo) => {
           const pendencia = pendencias.find((p) => p.tecnico === tecnico);
           if (!pendencia) return;
-          reordenacao.registrar({ tecnico, dia, motivo, quem, mudancas: pendencia.decididas });
+          void reordenacao.registrar({ tecnico, dia, motivo, quem, remexidas: pendencia.remexidas });
         }}
       />
     </>

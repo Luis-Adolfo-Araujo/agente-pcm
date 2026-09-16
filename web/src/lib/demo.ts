@@ -15,8 +15,12 @@
 import { asset } from '@/lib/caminhos';
 import type {
   Backlog,
+  ConfirmacaoDeAjuste,
   FeedbackItem,
   FeedbackRecord,
+  PedidoDeAjuste,
+  Previa,
+  Revisao,
   Run,
   Schedule,
   Snapshot,
@@ -71,6 +75,14 @@ function emAndamento(completa: Run, passado: number): Run {
   };
 }
 
+/** Recusa nomeada: a tela distingue "não existe aqui" de "a API caiu". */
+export class DemoSemRevisao extends Error {
+  constructor() {
+    super('Ajustar a semana pede o agente atrás da página, e a demonstração não tem servidor.');
+    this.name = 'DemoSemRevisao';
+  }
+}
+
 export const demoApi = {
   snapshots: () => carregar<Snapshot[]>('snapshots'),
   runs: async () => (inicio === 0 ? [] : [await demoApi.run('')]),
@@ -99,6 +111,22 @@ export const demoApi = {
     };
     return pronta;
   },
+
+  /**
+   * Revisar a semana é o único ponto onde a demonstração ainda não alcança o
+   * piloto. Mover, incluir e mudar duração pedem a prévia das consequências, e
+   * essa conta é do agente, no servidor: o ranking, a capacidade líquida e o
+   * verificador decidem o que cada arrasto empurra. Reimplementar essa regra
+   * aqui em JavaScript daria uma segunda verdade, que divergiria da primeira
+   * sem avisar — e a demonstração existe justamente para mostrar a primeira.
+   * Até os artefatos congelados cobrirem a revisão, estas recusam.
+   */
+  revision: (_id: string): Promise<Revisao> => Promise.reject(new DemoSemRevisao()),
+  previewAdjustments: (_id: string, _body: PedidoDeAjuste): Promise<Previa> =>
+    Promise.reject(new DemoSemRevisao()),
+  confirmAdjustments: (_id: string, _body: ConfirmacaoDeAjuste): Promise<Revisao> =>
+    Promise.reject(new DemoSemRevisao()),
+  undoAdjustments: (_id: string): Promise<Revisao> => Promise.reject(new DemoSemRevisao()),
 
   feedback: async (id: string, body: { recorded_by: string; items: FeedbackItem[] }) => {
     const completa = await base();

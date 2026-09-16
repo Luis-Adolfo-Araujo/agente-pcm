@@ -3,7 +3,9 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { CartaoOrdem } from '@/components/quadro/CartaoOrdem';
 import { horas } from '@/lib/semana';
 import type { Coluna } from '@/lib/quadro';
+import { CAUSA } from '@/lib/rotulos';
 import type { Remanejo } from '@/lib/remanejos';
+import type { MarcasDaRevisao } from '@/lib/revisao';
 import type { Troca } from '@/lib/trocas';
 
 export type Arraste = { operationId: string; tecnico: string; posicao: number };
@@ -19,7 +21,7 @@ export type AlvoArraste = { tecnico: string; posicao: number | null };
  */
 export function ColunaTecnico({
   coluna, titulos, trocas, remanejos, inicioOriginal, ativa, arraste, alvo, popover,
-  onAbrirOrdem, onArrastarInicio, onArrastarSobre, onSoltar, onArrastarFim, onTeclado,
+  onAbrirOrdem, onTirarDaSemana, onMarcarIndisponivel, marcas, onArrastarInicio, onArrastarSobre, onSoltar, onArrastarFim, onTeclado,
 }: {
   coluna: Coluna;
   titulos: Map<string, string>;
@@ -34,6 +36,12 @@ export function ColunaTecnico({
   /** A troca que caiu nesta coluna e ainda espera quem e por quê. */
   popover: ReactNode;
   onAbrirOrdem: (operationId: string) => void;
+  /** Abre a prévia de tirar a ordem da semana. */
+  onTirarDaSemana: (operationId: string) => void;
+  /** Incluídas e durações alteradas, para as marcas do cartão. */
+  marcas: MarcasDaRevisao;
+  /** Abre a prévia de marcar esta pessoa como indisponível. */
+  onMarcarIndisponivel: () => void;
   onArrastarInicio: (operationId: string, posicao: number) => void;
   onArrastarSobre: (posicao: number | null) => void;
   onSoltar: (posicao: number | null) => void;
@@ -52,20 +60,32 @@ export function ColunaTecnico({
     <section
       className="coluna"
       data-alvo={recebendo ? 'sim' : undefined}
+      data-indisponivel={coluna.indisponivel ? 'sim' : undefined}
       aria-label={`Dia de ${coluna.tecnico}`}
       onDragOver={(event) => {
-        if (!arraste) return;
+        if (!arraste || coluna.indisponivel) return;
         event.preventDefault();
         onArrastarSobre(null);
       }}
       onDrop={(event) => {
-        if (!arraste) return;
+        if (!arraste || coluna.indisponivel) return;
         event.preventDefault();
         onSoltar(null);
       }}
     >
       <header className="coluna-cabeca">
-        <div className="coluna-nome">{coluna.tecnico}</div>
+        <div className="coluna-nome-linha">
+          <div className="coluna-nome">{coluna.tecnico}</div>
+          <button
+            type="button"
+            className="acao-tecnico"
+            aria-label={`Marcar ${coluna.tecnico} como indisponível`}
+            title="Marcar indisponível"
+            onClick={onMarcarIndisponivel}
+          >
+            ⋯
+          </button>
+        </div>
         <span className="carga" data-estourou={coluna.estourou ? 'sim' : undefined} aria-hidden="true">
           <i style={{ width: `${preenchimento}%` }} />
         </span>
@@ -98,7 +118,9 @@ export function ColunaTecnico({
       <div className="coluna-corpo">
         {coluna.ordens.length === 0 ? (
           <p className="coluna-vazia">
-            {coluna.escala > 0 ? 'Nada alocado. Arraste uma ordem para cá.' : 'Nada alocado neste dia.'}
+            {coluna.indisponivel
+              ? `${CAUSA[coluna.indisponivel]} · não recebe ordens neste dia`
+              : coluna.escala > 0 ? 'Nada alocado. Arraste uma ordem para cá.' : 'Nada alocado neste dia.'}
           </p>
         ) : (
           coluna.ordens.map((ordem, i) => (
@@ -139,6 +161,9 @@ export function ColunaTecnico({
                 dividida={ordem.worker_ids.length > 1}
                 ativa={ordem.operation_id === ativa}
                 onAbrir={() => onAbrirOrdem(ordem.operation_id)}
+                onRemover={() => onTirarDaSemana(ordem.operation_id)}
+                incluida={marcas.incluidas.has(ordem.operation_id)}
+                duracaoAntes={marcas.duracaoAntes.get(ordem.operation_id)}
                 onTeclado={(event) => onTeclado(ordem.operation_id, i, event)}
               />
             </div>

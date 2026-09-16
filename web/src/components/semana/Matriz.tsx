@@ -4,13 +4,13 @@ import { LinhaExecutante } from '@/components/semana/LinhaExecutante';
 import { PopoverRemanejo } from '@/components/quadro/PopoverRemanejo';
 import { PopoverTroca } from '@/components/quadro/PopoverTroca';
 import type { useArraste } from '@/components/quadro/useArraste';
-import type { useRemanejos } from '@/components/sessao/useRemanejos';
-import type { Pedido } from '@/components/sessao/useTrocas';
+import type { Pedido, Remanejador } from '@/components/sessao/useRevisao';
 import { decidirSolta, destinoDaCelula, ocupacaoDoDia, type LinhaSemana, type Solta } from '@/lib/matriz';
 import { inicioNoDia } from '@/lib/remanejos';
 import { diaDe, minutosDe, rotuloDia } from '@/lib/semana';
 import type { Schedule } from '@/lib/api';
 import type { Remanejo } from '@/lib/remanejos';
+import type { MarcasDaRevisao } from '@/lib/revisao';
 import type { Troca } from '@/lib/trocas';
 
 /** Um cartão solto numa célula, esperando quem move e por quê. */
@@ -43,7 +43,7 @@ function agregado(ocupacao: number | null): string {
  */
 export function Matriz({
   dias, linhas, todas, schedule, base, titulos, trocas, remanejos, ativa, total,
-  onAbrirOrdem, onAbrirDia, arraste, remanejo, trocar, gravando, erro, limparErro,
+  onAbrirOrdem, onTirarDaSemana, onMarcarIndisponivel, marcas, onAbrirDia, arraste, remanejo, trocar, gravando, erro, limparErro,
 }: {
   dias: string[];
   /** As linhas que a tela desenha, já filtradas. */
@@ -60,9 +60,15 @@ export function Matriz({
   /** Ordens alocadas na semana, para o canto do cabeçalho. */
   total: number;
   onAbrirOrdem: (operationId: string) => void;
+  /** Abre a prévia de tirar a ordem da semana. */
+  onTirarDaSemana: (operationId: string) => void;
+  /** Incluídas e durações alteradas, para as marcas do cartão. */
+  marcas: MarcasDaRevisao;
+  /** Abre a prévia de marcar alguém como indisponível. */
+  onMarcarIndisponivel: (tecnico: string, dia: string) => void;
   onAbrirDia: (dia: string) => void;
   arraste: ReturnType<typeof useArraste>;
-  remanejo: ReturnType<typeof useRemanejos>;
+  remanejo: Remanejador;
   trocar: (pedido: Pedido) => Promise<boolean>;
   gravando: boolean;
   erro: string | null;
@@ -248,6 +254,9 @@ export function Matriz({
                 onAlternar={() => alternar(linha.tecnico)}
                 onAbrirDia={onAbrirDia}
                 onAbrirOrdem={onAbrirOrdem}
+                onTirarDaSemana={onTirarDaSemana}
+                onMarcarIndisponivel={() => onMarcarIndisponivel(linha.tecnico, dias[0])}
+                marcas={marcas}
                 onArrastarInicio={(operationId, posicao) => {
                   arraste.comecar(operationId, linha.tecnico, posicao);
                 }}

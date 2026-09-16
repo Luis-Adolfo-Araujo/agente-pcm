@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { quemSalvo } from '@/lib/api';
 import { escalaImpossivel, horas } from '@/lib/semana';
-import type { Pedido } from '@/components/sessao/useTrocas';
+import type { Pedido } from '@/components/sessao/useRevisao';
 
 export type Destino = {
   worker_id: string;

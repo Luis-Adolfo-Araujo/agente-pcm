@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Chevron, type EstadoEtapa, type Metrica } from '@/components/Chevron';
+import { useRevisao } from '@/components/sessao/useRevisao';
 import { Base } from '@/components/stages/Base';
 import { Decidir } from '@/components/stages/Decidir';
 import { Montar } from '@/components/stages/Montar';
 import { Semana } from '@/components/stages/Semana';
 import { EmptyState } from '@/components/ui';
-import { asset } from '@/lib/caminhos';
 import {
   ApiError,
   BASE,
@@ -58,13 +58,13 @@ function Assinatura() {
   useEffect(() => {
     const teste = new window.Image();
     teste.onload = () => setTemArquivo(true);
-    teste.src = asset('/senai.svg');
+    teste.src = '/senai.svg';
   }, []);
 
   return (
     <div className="brand-signature">
       {temArquivo ? (
-        <img src={asset('/senai.svg')} alt="SENAI" />
+        <img src="/senai.svg" alt="SENAI" />
       ) : (
         <span className="brand-slot" title="Coloque o SVG oficial em public/senai.svg">
           assinatura senai · 36px
@@ -89,6 +89,9 @@ export default function Home() {
   const [working, setWorking] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
+  // A revisão mora aqui, acima das etapas: a semana mostra e a decisão aprova a mesma.
+  const revisor = useRevisao(run?.status === 'completed' ? run.run_id : null);
+  const conferencia = revisor.revisao?.verification ?? verification;
 
   useEffect(() => {
     api.snapshots()
@@ -151,13 +154,16 @@ export default function Home() {
     setWorking(true);
     setErro(null);
     try {
-      setRun(await api.decide(run.run_id, { decision: decisao, decided_by: quem, reason: motivo }));
+      setRun(await api.decide(run.run_id, {
+        decision: decisao, decided_by: quem, reason: motivo,
+        revision_sequence: revisor.revisao?.revision_sequence ?? 0,
+      }));
     } catch (causa) {
       setErro(mensagem(causa));
     } finally {
       setWorking(false);
     }
-  }, [run]);
+  }, [run, revisor.revisao]);
 
   const snapshot = snapshots.find((s) => s.snapshot_id === snapshotId) ?? null;
   const rodando = !!run && run.status !== 'completed' && run.status !== 'failed';
@@ -201,8 +207,8 @@ export default function Home() {
     if (id === 3) {
       if (!schedule) return { value: '—' };
       // A violação dura decide se dá para aprovar: ela ganha a métrica quando existe.
-      if (verification && verification.violations.length > 0) {
-        return { value: `${verification.violations.length} violações`, tone: 'bad' };
+      if (conferencia && conferencia.violations.length > 0) {
+        return { value: `${conferencia.violations.length} violações`, tone: 'bad' };
       }
       const c = schedule.coverage;
       return {
@@ -286,11 +292,12 @@ export default function Home() {
                     schedule={schedule}
                     backlog={backlog}
                     verification={verification}
+                    revisor={revisor}
                     onVerViolacoes={() => { setPedidoDeTrace((n) => n + 1); irPara(2); }}
                   />
                 : <EmptyState title="Nenhuma semana montada ainda" description="Volte à etapa 2 e monte a primeira." />)}
               {etapa === 4 && (run && verification
-                ? <Decidir run={run} verification={verification} onDecide={decidir} working={working} error={erro} />
+                ? <Decidir run={run} verification={verification} revisao={revisor.revisao} onDecide={decidir} working={working} error={erro} />
                 : <EmptyState title="Nada para decidir ainda" description="Monte a semana primeiro." />)}
             </>
           )}

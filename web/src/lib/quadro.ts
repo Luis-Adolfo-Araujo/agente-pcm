@@ -1,4 +1,4 @@
-import type { Assignment, Capacity } from '@/lib/api';
+import type { Assignment, Capacity, Causa } from '@/lib/api';
 import { carga, diaDe, escalaDoDia, escalaImpossivel } from '@/lib/semana';
 import { remanejosNoConjunto, type Remanejo } from '@/lib/remanejos';
 import { trocasNoConjunto, type Troca } from '@/lib/trocas';
@@ -15,6 +15,8 @@ export type Coluna = {
   trocadas: number;
   /** Quantas chegaram de outro dia, por remanejo da sessão. */
   movidas: number;
+  /** Por que a pessoa não trabalha neste dia, se houver ajuste dizendo isso. */
+  indisponivel: Causa | null;
 };
 
 /**
@@ -28,10 +30,14 @@ export function colunasDoDia(
   dia: string,
   trocas: Troca[],
   remanejos: Remanejo[] = [],
+  indisponiveis: Map<string, Map<string, Causa>> = new Map(),
 ): Coluna[] {
   const porTecnico = new Map<string, Assignment[]>();
   capacidades.forEach((c) => {
     if (c.slots.some((slot) => diaDe(slot.window.start) === dia)) porTecnico.set(c.worker_id, []);
+  });
+  indisponiveis.forEach((doTecnico, tecnico) => {
+    if (doTecnico.has(dia) && !porTecnico.has(tecnico)) porTecnico.set(tecnico, []);
   });
   assignments
     .filter((a) => diaDe(a.window.start) === dia)
@@ -51,6 +57,7 @@ export function colunasDoDia(
         impossivel: escalaImpossivel(escala),
         trocadas: trocasNoConjunto(trocas, emOrdem),
         movidas: remanejosNoConjunto(remanejos, emOrdem),
+        indisponivel: indisponiveis.get(tecnico)?.get(dia) ?? null,
       };
     })
     .sort((a, b) => b.ordens.length - a.ordens.length || a.tecnico.localeCompare(b.tecnico));

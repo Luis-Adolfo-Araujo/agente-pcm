@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react';
 import { CelulaDia } from '@/components/semana/CelulaDia';
 import { ordensVisiveis, type LinhaSemana } from '@/lib/matriz';
+import type { MarcasDaRevisao } from '@/lib/revisao';
 import { horas } from '@/lib/semana';
 
 /**
@@ -13,7 +14,7 @@ import { horas } from '@/lib/semana';
  */
 export function LinhaExecutante({
   linha, aberta, alvo, arrastando, titulos, inicioOriginal, trocadas, movidas, ativa, popoverEm,
-  onAlternar, onAbrirDia, onAbrirOrdem, onArrastarInicio, onArrastarFim, onMirar, onSair, onSoltar,
+  onAlternar, onMarcarIndisponivel, onAbrirDia, onAbrirOrdem, onTirarDaSemana, marcas, onArrastarInicio, onArrastarFim, onMirar, onSair, onSoltar,
 }: {
   linha: LinhaSemana;
   aberta: boolean;
@@ -30,6 +31,12 @@ export function LinhaExecutante({
   onAlternar: () => void;
   onAbrirDia: (dia: string) => void;
   onAbrirOrdem: (operationId: string) => void;
+  /** Abre a prévia de tirar a ordem da semana. */
+  onTirarDaSemana: (operationId: string) => void;
+  /** Incluídas e durações alteradas, para as marcas do cartão. */
+  marcas: MarcasDaRevisao;
+  /** Abre a prévia de marcar a pessoa como indisponível. */
+  onMarcarIndisponivel: () => void;
   onArrastarInicio: (operationId: string, posicao: number) => void;
   onArrastarFim: () => void;
   onMirar: (dia: string) => void;
@@ -56,6 +63,15 @@ export function LinhaExecutante({
             <path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span className="pessoa-nome">{linha.tecnico}</span>
+        </button>
+        <button
+          type="button"
+          className="acao-tecnico"
+          aria-label={`Marcar ${linha.tecnico} como indisponível`}
+          title="Marcar indisponível"
+          onClick={onMarcarIndisponivel}
+        >
+          ⋯
         </button>
         <div className="pessoa-semana" data-estourou={linha.estourou ? 'sim' : undefined}>
           <span className="ocupacao" aria-hidden="true"><i style={{ width: `${preenchimento}%` }} /></span>
@@ -86,6 +102,8 @@ export function LinhaExecutante({
           popover={popoverEm?.dia === celula.dia ? popoverEm.conteudo : null}
           onAbrirDia={() => onAbrirDia(celula.dia)}
           onAbrirOrdem={onAbrirOrdem}
+          onTirarDaSemana={onTirarDaSemana}
+          marcas={marcas}
           onArrastarInicio={onArrastarInicio}
           onArrastarFim={onArrastarFim}
           onMirar={() => onMirar(celula.dia)}

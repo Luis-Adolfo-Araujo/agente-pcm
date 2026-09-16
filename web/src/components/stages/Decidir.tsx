@@ -1,11 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { Badge, Card, CardContent, CardHeader, PageHead } from '@/components/ui';
-import type { Run, Verification } from '@/lib/api';
+import type { Revisao, Run, Verification } from '@/lib/api';
 
-export function Decidir({ run, verification, onDecide, working, error }: {
+export function Decidir({ run, verification, revisao, onDecide, working, error }: {
   run: Run;
   verification: Verification;
+  /** A revisão que está na tela. Aprovar confere esta, não a proposta do agente. */
+  revisao: Revisao | null;
   onDecide: (decisao: 'approve' | 'reject', quem: string, motivo: string) => void;
   working: boolean;
   error: string | null;
@@ -13,7 +15,9 @@ export function Decidir({ run, verification, onDecide, working, error }: {
   const [quem, setQuem] = useState('');
   const [motivo, setMotivo] = useState('');
   const decidida = run.decision;
-  const podeAprovar = verification.valid;
+  const podeAprovar = (revisao?.verification ?? verification).valid;
+  const ajustes = revisao?.revision_sequence ?? 0;
+  const criadas = revisao?.created_violations.length ?? 0;
 
   return (
     <>
@@ -43,6 +47,15 @@ export function Decidir({ run, verification, onDecide, working, error }: {
         <Card>
           <CardHeader>Registrar a decisão</CardHeader>
           <CardContent>
+            {ajustes > 0 && (
+              <div className="note" style={{ marginBottom: 18 }}>
+                Você vai decidir sobre a <strong>revisão {ajustes}</strong>: a proposta do agente com{' '}
+                {ajustes} {ajustes === 1 ? 'ajuste seu' : 'ajustes seus'}.
+                {criadas > 0 && (
+                  <> {criadas} {criadas === 1 ? 'violação criada pelos ajustes impede' : 'violações criadas pelos ajustes impedem'} a aprovação.</>
+                )}
+              </div>
+            )}
             {!podeAprovar && (
               <div className="note" data-tone="bad" style={{ marginBottom: 18 }}>
                 A conferência encontrou violações duras. Só é possível rejeitar.
@@ -83,6 +96,7 @@ export function Decidir({ run, verification, onDecide, working, error }: {
           <p className="mono" style={{ margin: 0 }}>
             execução {run.run_id}<br />
             recorte {run.snapshot_id}<br />
+            revisão {ajustes}<br />
             período {new Date(run.request.period.start).toLocaleDateString('pt-BR')} – {new Date(run.request.period.end).toLocaleDateString('pt-BR')}
           </p>
         </CardContent>

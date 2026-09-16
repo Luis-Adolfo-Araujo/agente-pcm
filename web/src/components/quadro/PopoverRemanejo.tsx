@@ -167,8 +167,7 @@ export function PopoverRemanejo({
       )}
 
       <p className="popover-nota">
-        Isto não reescreve a proposta. Fica gravada a sua discordância com o encaixe — dia, hora
-        e pessoa.
+        Grava um ajuste na revisão e a sua discordância com o encaixe — dia, hora e pessoa.
       </p>
 
       {erro && <div className="note" data-tone="bad">{erro}</div>}

@@ -1,11 +1,11 @@
-import type { Assignment, Backlog, Capacity } from '@/lib/api';
+import type { Assignment, Backlog, Capacity, Causa } from '@/lib/api';
 import { carga, diaDe, escalaDoDia, minutosDe } from '@/lib/semana';
 
 /**
  * O que a célula está dizendo. É estado, e não uma faixa de cor, porque o
  * mesmo nome precisa aparecer no rótulo: a matriz nunca informa só por cor.
  */
-export type EstadoCelula = 'sem-escala' | 'ocioso' | 'dentro' | 'cheio' | 'estourou';
+export type EstadoCelula = 'sem-escala' | 'ocioso' | 'dentro' | 'cheio' | 'estourou' | 'indisponivel';
 
 /** O dia de uma pessoa, visto de cima — uma barra, não uma fila de relógio. */
 export type CelulaSemana = {
@@ -21,6 +21,11 @@ export type CelulaSemana = {
    */
   ocupacao: number | null;
   estado: EstadoCelula;
+  /**
+   * Por que a pessoa não trabalha neste dia, quando há um ajuste dizendo isso.
+   * Indisponível não é "sem escala" nem "0%": a escala existia e foi retirada.
+   */
+  indisponivel: Causa | null;
 };
 
 export type LinhaSemana = {
@@ -62,6 +67,7 @@ export function linhasDaSemana(
   assignments: Assignment[],
   capacidades: Capacity[],
   dias: string[],
+  indisponiveis: Map<string, Map<string, Causa>> = new Map(),
 ): LinhaSemana[] {
   const noPeriodo = new Set(dias);
   const porTecnico = new Map<string, Map<string, Assignment[]>>();
@@ -73,6 +79,11 @@ export function linhasDaSemana(
 
   capacidades.forEach((c) => {
     if (c.slots.some((slot) => noPeriodo.has(diaDe(slot.window.start)))) garantir(c.worker_id);
+  });
+  // Quem está ausente perdeu a escala desses dias, e sem isto sumiria da matriz
+  // justamente na semana em que a ausência precisa aparecer.
+  indisponiveis.forEach((doTecnico, tecnico) => {
+    if ([...doTecnico.keys()].some((dia) => noPeriodo.has(dia))) garantir(tecnico);
   });
   assignments.forEach((a) => {
     const dia = diaDe(a.window.start);
@@ -90,7 +101,13 @@ export function linhasDaSemana(
           .sort((a, b) => a.window.start.localeCompare(b.window.start));
         const minutos = carga(ordens);
         const escala = escalaDoDia(capacidades, tecnico, dia);
-        return { dia, ordens, minutos, escala, ocupacao: ocupacaoDe(minutos, escala), estado: estadoDaCelula(minutos, escala) };
+        const indisponivel = indisponiveis.get(tecnico)?.get(dia) ?? null;
+        return {
+          dia, ordens, minutos, escala,
+          ocupacao: ocupacaoDe(minutos, escala),
+          estado: indisponivel ? 'indisponivel' : estadoDaCelula(minutos, escala),
+          indisponivel,
+        };
       });
       const minutos = celulas.reduce((soma, c) => soma + c.minutos, 0);
       const escala = celulas.reduce((soma, c) => soma + c.escala, 0);

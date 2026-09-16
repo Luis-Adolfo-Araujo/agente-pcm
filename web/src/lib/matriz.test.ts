@@ -3,7 +3,7 @@ import {
   decidirSolta, destinoDaCelula, estadoDaCelula, filtrarLinhas, linhasDaSemana, locaisDoBacklog,
   ocupacaoDoDia,
 } from '@/lib/matriz';
-import type { Assignment, Capacity, Enriched } from '@/lib/api';
+import type { Assignment, Capacity, Causa, Enriched } from '@/lib/api';
 
 function alocacao(op: string, workers: string[], inicio: string, fim: string): Assignment {
   return {
@@ -352,5 +352,24 @@ describe('destinoDaCelula', () => {
 
   it('quem não está na matriz não tem destino', () => {
     expect(destinoDaCelula(linhas(), 'carla', SEG)).toBeNull();
+  });
+});
+
+describe('indisponível na semana', () => {
+  const indisponiveis = new Map<string, Map<string, Causa>>([
+    ['ana', new Map<string, Causa>([[SEG, 'vacation']])],
+  ]);
+
+  it('dá linha a quem está indisponível mesmo sem escala nenhuma no período', () => {
+    const linhas = linhasDaSemana([], [], DIAS, indisponiveis);
+    expect(linhas.map((l) => l.tecnico)).toEqual(['ana']);
+    expect(linhas[0].celulas.map((c) => c.estado)).toEqual(['indisponivel', 'sem-escala']);
+  });
+
+  it('a célula indisponível diz a causa e não pesa na ocupação da semana', () => {
+    const [linha] = linhasDaSemana([], [capacidade('ana', [oitoHoras(TER)])], DIAS, indisponiveis);
+    expect(linha.celulas[0]).toMatchObject({ estado: 'indisponivel', indisponivel: 'vacation', ocupacao: null });
+    expect(linha.celulas[1]).toMatchObject({ estado: 'ocioso', indisponivel: null });
+    expect(linha.escala).toBe(480);
   });
 });

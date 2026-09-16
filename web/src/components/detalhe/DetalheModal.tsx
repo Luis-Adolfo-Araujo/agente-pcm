@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Badge, Modal } from '@/components/ui';
 import { DetalheOrdem } from '@/components/detalhe/DetalheOrdem';
 import { TrocarTecnico, type Destino } from '@/components/detalhe/TrocarTecnico';
-import type { Pedido } from '@/components/sessao/useTrocas';
+import type { Pedido } from '@/components/sessao/useRevisao';
 import { REASON_NAMES, hora, type Backlog, type Schedule } from '@/lib/api';
 import { carga, diaDe, escalaDoDia, minutosDe, tecnicosComEscala, type Indice } from '@/lib/semana';
 import { trocaDaOrdem, type Troca } from '@/lib/trocas';
@@ -15,7 +15,8 @@ import { trocaDaOrdem, type Troca } from '@/lib/trocas';
 export type Alvo = { tipo: 'ordem'; operationId: string };
 
 export function DetalheModal({
-  alvo, onFechar, indice, backlog, schedule, trocas, trocar, gravando, erro, limparErro,
+  alvo, onFechar, indice, backlog, schedule, trocas, trocar, onTirarDaSemana, onAlterarDuracao, onIncluir,
+  gravando, erro, limparErro,
 }: {
   alvo: Alvo | null;
   onFechar: () => void;
@@ -25,6 +26,12 @@ export function DetalheModal({
   schedule: Schedule;
   trocas: Troca[];
   trocar: (pedido: Pedido) => Promise<boolean>;
+  /** Abre a prévia de tirar a ordem da semana. */
+  onTirarDaSemana: (operationId: string) => void;
+  /** Abre a prévia de alterar o tempo previsto. Vale também para ordem fora da semana. */
+  onAlterarDuracao: (operationId: string) => void;
+  /** Abre a prévia de incluir a ordem na semana. */
+  onIncluir: (operationId: string) => void;
   gravando: boolean;
   erro: string | null;
   limparErro: () => void;
@@ -131,6 +138,33 @@ export function DetalheModal({
             {item.duration.minutes ? `${item.duration.minutes} min` : 'sem duração'}
             {' · '}score {item.priority.score.toFixed(1)}
           </span>
+        </div>
+        <div className="detalhe-acoes">
+          {alocada && (
+            <button
+              type="button"
+              className="btn btn-menor"
+              onClick={() => onTirarDaSemana(item.operation.operation_id)}
+            >
+              Tirar da semana
+            </button>
+          )}
+          {fora && (
+            <button
+              type="button"
+              className="btn btn-menor"
+              onClick={() => onIncluir(item.operation.operation_id)}
+            >
+              Incluir na semana
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn btn-menor"
+            onClick={() => onAlterarDuracao(item.operation.operation_id)}
+          >
+            Alterar tempo previsto
+          </button>
         </div>
         <DetalheOrdem
           item={item}

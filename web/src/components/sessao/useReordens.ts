@@ -1,22 +1,22 @@
 'use client';
 import { useCallback, useMemo, useState } from 'react';
-import { ApiError, api, hora, salvarQuem, type FeedbackItem, type Schedule } from '@/lib/api';
+import { hora, type FeedbackDoAjuste, type RascunhoDeAjuste, type Schedule } from '@/lib/api';
+import type { Confirmacao } from '@/components/sessao/useRevisao';
 import {
-  aplicarReordens, motivoDaReordenacao, reordenacaoDe, type Mudanca, type Reordenacao,
+  aplicarReordens, motivoDaReordenacao, reordenacaoDe, trocasDePosicao, type Mudanca, type Reordenacao,
 } from '@/lib/reordenar';
 
 /**
- * A sequência só sai da sessão quando alguém a registra com um motivo — e a
- * ordem importa: gravar primeiro, marcar como registrada depois. O contrário
- * deixaria a tela dizendo que o agente aprendeu algo que não saiu daqui.
+ * O rascunho da sequência de cada dia. Remexer a ordem de um dia são várias
+ * arrastadas até ficar bom, então ele vive só na tela até alguém registrar — e
+ * registrar grava um grupo na revisão, um `move` com hora para cada ordem cujo
+ * horário mudou. Gravado, o rascunho some: a revisão já tem as horas novas.
  */
-export function useReordens(runId: string | null, schedule: Schedule | null) {
+export function useReordens(confirmar: (pedido: Confirmacao) => Promise<boolean>) {
   const [reordens, setReordens] = useState<Reordenacao[]>([]);
   const [gravando, setGravando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
 
   const definir = useCallback((tecnico: string, dia: string, sequencia: string[]) => {
-    setErro(null);
     setReordens((atuais) => [
       ...atuais.filter((r) => !(r.tecnico === tecnico && r.dia === dia)),
       { tecnico, dia, sequencia, registrada: false },
@@ -24,46 +24,39 @@ export function useReordens(runId: string | null, schedule: Schedule | null) {
   }, []);
 
   const desfazer = useCallback((tecnico: string, dia: string) => {
-    setErro(null);
     setReordens((atuais) => atuais.filter((r) => !(r.tecnico === tecnico && r.dia === dia)));
   }, []);
 
   const registrar = useCallback(async (
-    { tecnico, dia, motivo, quem, mudancas }:
-    { tecnico: string; dia: string; motivo: string; quem: string; mudancas: Mudanca[] },
+    { tecnico, dia, motivo, quem, remexidas }:
+    { tecnico: string; dia: string; motivo: string; quem: string; remexidas: Mudanca[] },
   ): Promise<boolean> => {
-    if (!runId || mudancas.length === 0) return false;
+    if (remexidas.length === 0) return false;
     setGravando(true);
-    setErro(null);
     try {
-      const itens: FeedbackItem[] = mudancas.map((m) => ({
-        operation_id: m.operation_id,
-        skill: 'schedule',
-        verdict: 'incorrect',
-        reason: motivoDaReordenacao(m, hora, motivo.trim()),
+      // `replace_worker_id` igual a quem já faz: a ordem dividida mantém a
+      // outra pessoa, e só a hora muda.
+      const acoes = remexidas.map((m): RascunhoDeAjuste => ({
+        kind: 'move', operation_id: m.operation_id, target_date: dia,
+        target_worker_id: tecnico, replace_worker_id: tecnico, target_start: m.paraInicio,
       }));
-      await api.feedback(runId, { recorded_by: quem.trim(), items: itens });
-      salvarQuem(quem);
-      setReordens((atuais) => atuais.map((r) => (
-        r.tecnico === tecnico && r.dia === dia ? { ...r, registrada: true } : r
-      )));
-      return true;
-    } catch (causa) {
-      setErro(
-        causa instanceof ApiError
-          ? `A API recusou o registro (${causa.status}). A sequência continua só nesta tela.`
-          : 'Não foi possível registrar a sequência. Ela continua só nesta tela.',
-      );
-      return false;
+      // Só vira feedback quem a pessoa tirou do lugar: as empurradas andaram de
+      // horário por consequência, não por discordância.
+      const feedback = trocasDePosicao(remexidas).map((m): FeedbackDoAjuste => ({
+        operation_id: m.operation_id, skill: 'schedule', reason: motivoDaReordenacao(m, hora, motivo.trim()),
+      }));
+      const ok = await confirmar({ acoes, quem, motivo, feedback });
+      if (ok) desfazer(tecnico, dia);
+      return ok;
     } finally {
       setGravando(false);
     }
-  }, [runId]);
+  }, [confirmar, desfazer]);
 
   /**
    * A sequência recebe uma ordem que chegou por troca depois de ela ter sido
-   * desenhada. Isto não é uma decisão nova: `registrada` fica como estava, ou a
-   * tela pediria para registrar de novo uma sequência que a pessoa não mexeu.
+   * desenhada. Isto não é uma decisão nova: o rascunho só ganha a ordem, na
+   * posição que o relógio dela pede.
    */
   const absorver = useCallback((tecnico: string, dia: string, sequencia: string[]) => {
     setReordens((atuais) => atuais.map((r) => (
@@ -84,12 +77,9 @@ export function useReordens(runId: string | null, schedule: Schedule | null) {
     desfazer,
     registrar,
     gravando,
-    erro,
-    limparErro: () => setErro(null),
     pendenteEm: (tecnico: string, dia: string) => {
       const r = reordenacaoDe(reordens, tecnico, dia);
       return !!r && !r.registrada;
     },
-    schedule,
   };
 }

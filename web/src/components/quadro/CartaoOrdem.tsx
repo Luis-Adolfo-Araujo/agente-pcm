@@ -9,7 +9,8 @@ import { horas, minutosDe } from '@/lib/semana';
  * arrasta precisa disso na mão, não atrás de um clique.
  */
 export function CartaoOrdem({
-  ordem, titulo, original, trocada, movida, dividida, ativa, onAbrir, onTeclado,
+  ordem, titulo, original, trocada, movida, dividida, incluida, duracaoAntes,
+  ativa, onAbrir, onTeclado, onRemover,
 }: {
   ordem: Assignment;
   titulo: string;
@@ -21,9 +22,15 @@ export function CartaoOrdem({
   movida: boolean;
   /** Tem mais de um executante, então aparece em mais de uma coluna. */
   dividida: boolean;
+  /** Entrou na semana por ajuste. */
+  incluida?: boolean;
+  /** A duração que o agente tinha estimado, quando ela foi alterada. */
+  duracaoAntes?: number | null;
   ativa: boolean;
   onAbrir: () => void;
   onTeclado: (event: KeyboardEvent) => void;
+  /** Tirar a ordem da semana pelo teclado. Ausente, a tecla não faz nada. */
+  onRemover?: () => void;
 }) {
   const mudouDeHora = !!original && original !== ordem.window.start;
 
@@ -36,9 +43,17 @@ export function CartaoOrdem({
       aria-label={
         `${titulo || ordem.work_order_id}, ${hora(ordem.window.start)} às ${hora(ordem.window.end)}. `
         + 'Alt com as setas move na coluna; Alt com as setas laterais passa para a pessoa ao lado.'
+        + (onRemover ? ' Delete tira da semana.' : '')
       }
       onClick={onAbrir}
-      onKeyDown={onTeclado}
+      onKeyDown={(event) => {
+        if (event.key === 'Delete' && onRemover) {
+          event.preventDefault();
+          onRemover();
+          return;
+        }
+        onTeclado(event);
+      }}
     >
       <span className="cartao-hora">
         {hora(ordem.window.start)}–{hora(ordem.window.end)}
@@ -50,6 +65,12 @@ export function CartaoOrdem({
         <span>{horas(minutosDe(ordem))}</span>
         {trocada && <span className="badge" data-tone="warn">trocada</span>}
         {movida && <span className="badge" data-tone="warn">movida</span>}
+        {incluida && <span className="badge" data-tone="warn">incluída</span>}
+        {duracaoAntes !== undefined && (
+          <span className="badge" data-tone="warn">
+            era {duracaoAntes === null ? 'sem duração' : horas(duracaoAntes)}
+          </span>
+        )}
         {dividida && <span className="badge" data-tone="mute">dividida</span>}
         <span className="cartao-score" title="score de prioridade">{ordem.priority_score.toFixed(0)}</span>
       </span>

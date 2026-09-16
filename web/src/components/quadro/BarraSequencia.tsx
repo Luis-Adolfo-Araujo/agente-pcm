@@ -5,8 +5,10 @@ import type { Mudanca } from '@/lib/reordenar';
 
 export type Pendencia = {
   tecnico: string;
-  /** As ordens que a pessoa de fato tirou do lugar. */
+  /** As ordens que a pessoa de fato tirou do lugar: é o que vira feedback. */
   decididas: Mudanca[];
+  /** Todas as que mudaram de horário, decididas e empurradas: é o que vira ajuste. */
+  remexidas: Mudanca[];
   /** As que só andaram de horário porque o dia foi reempacotado. */
   empurradas: number;
 };
@@ -60,7 +62,7 @@ function LinhaPendencia({ pendencia, gravando, onRegistrar, onDesfazer }: {
         {pendencia.empurradas > 0 && (
           <>; o horário de {pendencia.empurradas}{' '}
           {pendencia.empurradas === 1 ? 'outra' : 'outras'} andou junto</>
-        )} e os intervalos sumiram. Não reescreve a proposta: grava a sequência que você quer.
+        )} e os intervalos sumiram. Registrar grava as horas novas na revisão.
       </div>
       <div className="pendencia-campos">
         <div className="field">

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { colunasDoDia, inserirPeloRelogio } from '@/lib/quadro';
-import type { Assignment, Capacity } from '@/lib/api';
+import type { Assignment, Capacity, Causa } from '@/lib/api';
 
 function alocacao(op: string, workers: string[], inicio: string, fim: string): Assignment {
   return {
@@ -160,5 +160,15 @@ describe('inserirPeloRelogio', () => {
   it('põe no fim a ordem que não está na semana', () => {
     expect(inserirPeloRelogio(['op-manha'], ordens, 'op-fantasma'))
       .toEqual(['op-manha', 'op-fantasma']);
+  });
+});
+
+describe('colunasDoDia com indisponível', () => {
+  it('dá coluna marcada a quem está indisponível no dia, mesmo sem escala', () => {
+    const indisponiveis = new Map<string, Map<string, Causa>>([
+      ['bia', new Map<string, Causa>([[DIA, 'sick_leave']])],
+    ]);
+    const colunas = colunasDoDia([], [capacidade('ana', t('07:00'), t('16:00'))], DIA, [], [], indisponiveis);
+    expect(colunas.map((c) => [c.tecnico, c.indisponivel])).toEqual([['ana', null], ['bia', 'sick_leave']]);
   });
 });

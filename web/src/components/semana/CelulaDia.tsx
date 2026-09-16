@@ -2,6 +2,8 @@
 import type { ReactNode } from 'react';
 import { CartaoOrdem } from '@/components/quadro/CartaoOrdem';
 import type { CelulaSemana } from '@/lib/matriz';
+import { CAUSA } from '@/lib/rotulos';
+import type { MarcasDaRevisao } from '@/lib/revisao';
 import { horas, rotuloDia } from '@/lib/semana';
 
 /** Inteiro na célula; a casa decimal fica para o agregado do cabeçalho. */
@@ -19,7 +21,7 @@ function porcento(ocupacao: number): string {
 export function CelulaDia({
   celula, tecnico, aberta, recebendo, arrastando, titulos, inicioOriginal,
   trocadas, movidas, ativa, popover,
-  onAbrirDia, onAbrirOrdem, onArrastarInicio, onArrastarFim, onMirar, onSair, onSoltar,
+  onAbrirDia, onAbrirOrdem, onTirarDaSemana, marcas, onArrastarInicio, onArrastarFim, onMirar, onSair, onSoltar,
 }: {
   celula: CelulaSemana;
   tecnico: string;
@@ -38,6 +40,10 @@ export function CelulaDia({
   popover: ReactNode;
   onAbrirDia: () => void;
   onAbrirOrdem: (operationId: string) => void;
+  /** Abre a prévia de tirar a ordem da semana. */
+  onTirarDaSemana: (operationId: string) => void;
+  /** Incluídas e durações alteradas, para as marcas do cartão. */
+  marcas: MarcasDaRevisao;
   onArrastarInicio: (operationId: string, posicao: number) => void;
   onArrastarFim: () => void;
   onMirar: () => void;
@@ -46,14 +52,17 @@ export function CelulaDia({
 }) {
   const rotulo = rotuloDia(celula.dia);
   const semEscala = celula.escala === 0;
+  const ausencia = celula.indisponivel ? CAUSA[celula.indisponivel] : null;
   const preenchimento = celula.ocupacao === null
     ? (celula.minutos > 0 ? 100 : 0)
     : Math.min(100, celula.ocupacao);
 
-  const numero = celula.ocupacao === null ? 'sem escala' : porcento(celula.ocupacao);
-  const detalhe = semEscala
-    ? `${horas(celula.minutos)} alocadas sem escala declarada`
-    : `${horas(celula.minutos)} de ${horas(celula.escala)} de escala`;
+  const numero = ausencia ?? (celula.ocupacao === null ? 'sem escala' : porcento(celula.ocupacao));
+  const detalhe = ausencia
+    ? `${ausencia}: não recebe ordens neste dia`
+    : semEscala
+      ? `${horas(celula.minutos)} alocadas sem escala declarada`
+      : `${horas(celula.minutos)} de ${horas(celula.escala)} de escala`;
 
   return (
     <td
@@ -61,13 +70,13 @@ export function CelulaDia({
       data-estado={celula.estado}
       data-alvo={recebendo ? 'sim' : undefined}
       onDragOver={(event) => {
-        if (!arrastando) return;
+        if (!arrastando || celula.indisponivel) return;
         event.preventDefault();
         onMirar();
       }}
       onDragLeave={onSair}
       onDrop={(event) => {
-        if (!arrastando) return;
+        if (!arrastando || celula.indisponivel) return;
         event.preventDefault();
         onSoltar();
       }}
@@ -112,6 +121,9 @@ export function CelulaDia({
                 dividida={ordem.worker_ids.length > 1}
                 ativa={ordem.operation_id === ativa}
                 onAbrir={() => onAbrirOrdem(ordem.operation_id)}
+                onRemover={() => onTirarDaSemana(ordem.operation_id)}
+                incluida={marcas.incluidas.has(ordem.operation_id)}
+                duracaoAntes={marcas.duracaoAntes.get(ordem.operation_id)}
                 onTeclado={() => {}}
               />
             </div>
@@ -120,7 +132,7 @@ export function CelulaDia({
       )}
 
       {aberta && celula.ordens.length === 0 && (
-        <p className="celula-vazia">{semEscala ? 'sem escala' : 'livre'}</p>
+        <p className="celula-vazia">{ausencia ?? (semEscala ? 'sem escala' : 'livre')}</p>
       )}
     </td>
   );
