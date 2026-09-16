@@ -110,19 +110,10 @@ export function Base({ snapshots, selected, onSelect, onNext }: {
         <Stat label="Execuções no histórico" value={q.historical_execution_count.toLocaleString('pt-BR')} />
       </div>
 
-      {b.parcial ? (
-        <Card>
-          <CardHeader>O que tem no backlog</CardHeader>
-          <CardContent>
-            <div className="note" data-tone="bad" style={{ margin: 0 }}>
-              <strong>Esta API é mais antiga que a tela.</strong> Ela devolve quantas ordens vieram
-              da origem, mas não quanto disso está disponível para fazer — a separação entre ordem
-              aberta, em andamento e parada não vem no recorte. Reinicie o serviço do piloto para
-              esta parte aparecer.
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
+      {/* Sem a composição do backlog no recorte não há tabela a montar, e um alarme
+          no lugar dela cobraria de quem olha um conserto que não é dele: a origem do
+          recorte é que não trouxe o campo. A contagem crua acima já diz o que se sabe. */}
+      {b.parcial ? null : (
       <Card>
         <CardHeader>O que tem no backlog</CardHeader>
         <CardContent>
