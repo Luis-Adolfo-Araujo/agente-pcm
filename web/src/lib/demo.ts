@@ -13,6 +13,7 @@
  */
 
 import { asset } from '@/lib/caminhos';
+import { confirmarAjustesDemo, criarRevisaoDemo, preverAjustesDemo } from '@/lib/demoRevisao';
 import type {
   Backlog,
   ConfirmacaoDeAjuste,
@@ -40,6 +41,9 @@ async function carregar<T>(nome: string): Promise<T> {
 
 let pronta: Run | null = null;
 let inicio = 0;
+let revisaoAtual: Revisao | null = null;
+let historicoRevisoes: Revisao[] = [];
+let backlogDaRevisao: Backlog | null = null;
 
 async function base(): Promise<Run> {
   if (!pronta) pronta = await carregar<Run>('run');
@@ -75,14 +79,6 @@ function emAndamento(completa: Run, passado: number): Run {
   };
 }
 
-/** Recusa nomeada: a tela distingue "não existe aqui" de "a API caiu". */
-export class DemoSemRevisao extends Error {
-  constructor() {
-    super('Ajustar a semana pede o agente atrás da página, e a demonstração não tem servidor.');
-    this.name = 'DemoSemRevisao';
-  }
-}
-
 export const demoApi = {
   snapshots: () => carregar<Snapshot[]>('snapshots'),
   runs: async () => (inicio === 0 ? [] : [await demoApi.run('')]),
@@ -94,6 +90,9 @@ export const demoApi = {
   startRun: async (_body: { snapshot_id: string; period_start: string; period_end: string }) => {
     const completa = await base();
     inicio = Date.now();
+    revisaoAtual = null;
+    historicoRevisoes = [];
+    backlogDaRevisao = null;
     return emAndamento(completa, 0);
   },
 
@@ -112,21 +111,31 @@ export const demoApi = {
     return pronta;
   },
 
-  /**
-   * Revisar a semana é o único ponto onde a demonstração ainda não alcança o
-   * piloto. Mover, incluir e mudar duração pedem a prévia das consequências, e
-   * essa conta é do agente, no servidor: o ranking, a capacidade líquida e o
-   * verificador decidem o que cada arrasto empurra. Reimplementar essa regra
-   * aqui em JavaScript daria uma segunda verdade, que divergiria da primeira
-   * sem avisar — e a demonstração existe justamente para mostrar a primeira.
-   * Até os artefatos congelados cobrirem a revisão, estas recusam.
-   */
-  revision: (_id: string): Promise<Revisao> => Promise.reject(new DemoSemRevisao()),
-  previewAdjustments: (_id: string, _body: PedidoDeAjuste): Promise<Previa> =>
-    Promise.reject(new DemoSemRevisao()),
-  confirmAdjustments: (_id: string, _body: ConfirmacaoDeAjuste): Promise<Revisao> =>
-    Promise.reject(new DemoSemRevisao()),
-  undoAdjustments: (_id: string): Promise<Revisao> => Promise.reject(new DemoSemRevisao()),
+  /** A revisão pública é uma simulação local: usa o contrato real e some ao fechar a aba. */
+  revision: async (id: string): Promise<Revisao> => {
+    if (!revisaoAtual) {
+      const [schedule, backlog, verification] = await Promise.all([
+        carregar<Schedule>('schedule'), carregar<Backlog>('backlog'), carregar<Verification>('verification'),
+      ]);
+      revisaoAtual = criarRevisaoDemo(id || (await base()).run_id, schedule, backlog, verification);
+      backlogDaRevisao = backlog;
+    }
+    return revisaoAtual;
+  },
+  previewAdjustments: async (id: string, body: PedidoDeAjuste): Promise<Previa> => (
+    preverAjustesDemo(await demoApi.revision(id), backlogDaRevisao!, body)
+  ),
+  confirmAdjustments: async (id: string, body: ConfirmacaoDeAjuste): Promise<Revisao> => {
+    const atual = await demoApi.revision(id);
+    historicoRevisoes.push(atual);
+    revisaoAtual = confirmarAjustesDemo(atual, backlogDaRevisao!, body);
+    return revisaoAtual;
+  },
+  undoAdjustments: async (id: string): Promise<Revisao> => {
+    await demoApi.revision(id);
+    revisaoAtual = historicoRevisoes.pop() ?? revisaoAtual;
+    return revisaoAtual!;
+  },
 
   feedback: async (id: string, body: { recorded_by: string; items: FeedbackItem[] }) => {
     const completa = await base();
