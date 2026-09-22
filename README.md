@@ -9,15 +9,10 @@ A árvore separa:
 2. runtime do agente segundo `H = (E, T, C, S, L, V)`;
 3. plataforma operacional, integrações e entrega confiável.
 
-Comece por [`guidelines/architecture.md`](guidelines/architecture.md), que descreve
-a arquitetura de referência completa. O código versionado aqui cobre a fatia dela que
-o Agente Programador já exercita; o resto do desenho é ponto de extensão em aberto, e
-não um esqueleto de arquivos vazios no repositório.
-
-Documentos complementares:
-
-- [`guidelines/implementation_order.md`](guidelines/implementation_order.md): sequência sugerida de construção;
-- [`guidelines/ebook-construindo-agentes.md`](guidelines/ebook-construindo-agentes.md): fundamentação de harness, contexto, ferramentas e verificação.
+A anatomia `H` que o runtime persegue está descrita em
+[`src/agent/__init__.py`](src/agent/__init__.py). O código versionado aqui cobre a
+fatia dela que o Agente Programador já exercita; o resto do desenho é ponto de
+extensão em aberto, e não um esqueleto de arquivos vazios no repositório.
 
 ## Agente Programador de PCM
 
@@ -157,9 +152,6 @@ uv run pytest
 uv run ruff check src tests
 uv run mypy src tests
 ```
-
-Consulte [`docs/architecture/plano-implementacao-agente-programador.md`](docs/architecture/plano-implementacao-agente-programador.md)
-para o roadmap e os gates das próximas fases.
 
 ## Demonstração pública
 

@@ -9,8 +9,6 @@ __pycache__/
 planning-output/
 var/pilot/
 
-# Canvas de design gerado; as fontes .dc.html ficam versionadas
-docs/design/interface-piloto-maia.html
 .superpowers/
 
 # App web

@@ -14,4 +14,3 @@
 #
 # O harness é apenas uma das três camadas da arquitetura de referência:
 # produto/domínio → agent runtime → plataforma operacional.
-# Consulte guidelines/architecture.md para a visão completa.
