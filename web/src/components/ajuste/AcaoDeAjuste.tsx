@@ -13,6 +13,7 @@ import {
 } from '@/lib/pedidos';
 import { resumoDasConsequencias } from '@/lib/previa';
 import { motivoDeAjuste, type MarcasDaRevisao } from '@/lib/revisao';
+import { identidadeDoTecnico, nomeDoTecnico } from '@/lib/rotulos';
 import { rotuloDia, type Indice } from '@/lib/semana';
 
 /** A ação que está com o modal de prévia aberto. */
@@ -75,7 +76,7 @@ function AcaoIndisponivel({
   const acoes = pedidoDeIndisponibilidade(tecnico, valor.de, valor.ate, valor.causa, dias);
   return (
     <PreviaAjuste
-      titulo={`Marcar indisponível · ${tecnico}`}
+      titulo={`Marcar indisponível · ${nomeDoTecnico(tecnico)}`}
       acoes={acoes}
       formulario={<FormIndisponivel dias={dias} valor={valor} onMudar={setValor} />}
       vazio="Escolha os dias e o motivo para ver para onde vão as ordens dessa pessoa."
@@ -83,7 +84,7 @@ function AcaoIndisponivel({
       titulos={indice.titulos}
       feedback={() => []}
       anuncio={(previa) => (
-        `${tecnico} indisponível de ${rotuloDia(valor.de).numero} a ${rotuloDia(valor.ate).numero}. `
+        `${nomeDoTecnico(tecnico)} indisponível de ${rotuloDia(valor.de).numero} a ${rotuloDia(valor.ate).numero}. `
         + resumoDasConsequencias(previa)
       )}
       onFechar={onFechar}
@@ -149,7 +150,10 @@ function AcaoIncluir({
   if (!item) return null;
 
   const titulo = item.operation.title || operationId;
-  const onde = escolha ? `${escolha.tecnico} em ${rotuloDia(escolha.dia).numero}` : '';
+  const destino = escolha ? identidadeDoTecnico(escolha.tecnico) : null;
+  const quando = escolha ? rotuloDia(escolha.dia).numero : '';
+  const onde = destino ? `${destino.nome} em ${quando}` : '';
+  const ondeNoRegistro = destino ? `${destino.id} em ${quando}` : '';
   return (
     <PreviaAjuste
       titulo={`Incluir na semana · ${titulo}`}
@@ -174,7 +178,7 @@ function AcaoIncluir({
       feedback={(motivo) => {
         if (!escolha) return [];
         const itens: FeedbackDoAjuste[] = [{
-          operation_id: operationId, skill: 'ranking', reason: motivoDeAjuste(`incluir na semana com ${onde}`, motivo),
+          operation_id: operationId, skill: 'ranking', reason: motivoDeAjuste(`incluir na semana com ${ondeNoRegistro}`, motivo),
         }];
         if (precisaDuracao && digitada !== null) {
           itens.push({

@@ -1,6 +1,6 @@
 'use client';
 import { Badge } from '@/components/ui';
-import { BANDA, FONTE, MATERIAL } from '@/lib/rotulos';
+import { BANDA, FONTE, MATERIAL, nomeDoTecnico, nomesDosTecnicos } from '@/lib/rotulos';
 import { REASON_NAMES, dia, hora, type Assignment, type Enriched, type Unscheduled } from '@/lib/api';
 import type { Troca } from '@/lib/trocas';
 
@@ -80,12 +80,12 @@ export function ComoDeterminou({ item, alocada, fora, troca }: {
       : `${elegiveis.length} elegíveis de ${item.executants.length} candidatos`,
     tone: item.executants.length === 0 ? 'bad' : elegiveis.length === 0 ? 'warn' : 'good',
     evidencia: [
-      ...(escolhido.length > 0 ? [`O otimizador ficou com ${escolhido.join(', ')}.`] : []),
+      ...(escolhido.length > 0 ? [`O otimizador ficou com ${nomesDosTecnicos(escolhido)}.`] : []),
       ...(elegiveis.length === 0 && item.executants.length > 0
         ? ['Havia candidatos, mas nenhum passou nas regras de elegibilidade.']
         : []),
       ...(troca
-        ? [`Você passou para ${troca.para}: ${troca.motivo}`]
+        ? [`Você passou para ${nomeDoTecnico(troca.para)}: ${troca.motivo}`]
         : []),
     ],
   });

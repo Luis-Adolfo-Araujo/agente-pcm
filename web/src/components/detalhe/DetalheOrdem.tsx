@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Badge, Table, TabPanel, Tabs } from '@/components/ui';
 import { ComoDeterminou } from '@/components/detalhe/ComoDeterminou';
-import { BANDA, FATOR, FONTE, MATERIAL, valorNaOrdem } from '@/lib/rotulos';
+import { BANDA, FATOR, FONTE, MATERIAL, nomeDoTecnico, valorNaOrdem } from '@/lib/rotulos';
 import { hora, type Assignment, type Enriched, type Unscheduled } from '@/lib/api';
 import type { Troca } from '@/lib/trocas';
 
@@ -129,7 +129,7 @@ export function DetalheOrdem({ item, alocada, fora, troca, podeTrocar, onAbrirTr
                 return (
                   <tr key={e.worker_id} aria-selected={ehAtual || undefined}>
                     <td className="mono" style={{ color: 'var(--color-text)' }}>
-                      {e.worker_id}
+                      {nomeDoTecnico(e.worker_id)}
                       {ehAtual && <span className="marca-atual">nesta ordem</span>}
                     </td>
                     <td className="num">{e.score.toFixed(0)}</td>
@@ -171,7 +171,7 @@ export function DetalheOrdem({ item, alocada, fora, troca, podeTrocar, onAbrirTr
         {alocada && (
           <p className="muted" style={{ fontSize: '.84rem', marginBottom: 0 }}>
             Alocada das {hora(alocada.window.start)} às {hora(alocada.window.end)}.
-            {troca && ` Passada por você para ${troca.para}.`}
+            {troca && ` Passada por você para ${nomeDoTecnico(troca.para)}.`}
           </p>
         )}
         {fora && (

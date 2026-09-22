@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { CartaoOrdem } from '@/components/quadro/CartaoOrdem';
 import type { CelulaSemana } from '@/lib/matriz';
-import { CAUSA } from '@/lib/rotulos';
+import { CAUSA, nomeDoTecnico } from '@/lib/rotulos';
 import type { MarcasDaRevisao } from '@/lib/revisao';
 import { horas, rotuloDia } from '@/lib/semana';
 
@@ -85,7 +85,7 @@ export function CelulaDia({
         type="button"
         className="celula-medida"
         onClick={onAbrirDia}
-        aria-label={`${tecnico}, ${rotulo.nome} ${rotulo.numero}: ${numero}, ${detalhe}. Abrir o quadro deste dia.`}
+        aria-label={`${nomeDoTecnico(tecnico)}, ${rotulo.nome} ${rotulo.numero}: ${numero}, ${detalhe}. Abrir o quadro deste dia.`}
         title={detalhe}
       >
         <span className="ocupacao" aria-hidden="true">

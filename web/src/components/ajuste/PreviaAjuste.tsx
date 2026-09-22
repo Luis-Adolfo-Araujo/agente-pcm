@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Modal, Table } from '@/components/ui';
 import { mensagemDaApi, type Revisor } from '@/components/sessao/useRevisao';
 import { descreverLugar, destinoEfetivo, quantosAjustes, resumoDasConsequencias } from '@/lib/previa';
-import { CONSEQUENCIA, NOTA_DA_CASCATA } from '@/lib/rotulos';
+import { CONSEQUENCIA, NOTA_DA_CASCATA, nomeDoTecnico } from '@/lib/rotulos';
 import { horas, rotuloDia } from '@/lib/semana';
 import {
   quemSalvo, type Consequencia, type FeedbackDoAjuste, type Previa, type RascunhoDeAjuste,
@@ -167,7 +167,7 @@ export function PreviaAjuste({
                     const rotulo = rotuloDia(linha.date);
                     return (
                       <tr key={`${linha.worker_id}-${linha.date}`}>
-                        <td><span className="mono">{linha.worker_id}</span> · {rotulo.nome} {rotulo.numero}</td>
+                        <td><span className="mono">{nomeDoTecnico(linha.worker_id)}</span> · {rotulo.nome} {rotulo.numero}</td>
                         <td className="num">{horas(linha.before_minutes)}</td>
                         <td className="num" data-tone={estoura ? 'bad' : undefined}>
                           {horas(linha.after_minutes)}{estoura && ' · acima'}
@@ -196,7 +196,7 @@ export function PreviaAjuste({
                         <li key={`${v.code}-${v.operation_id ?? ''}-${v.worker_id ?? ''}-${i}`}>
                           <span className="mono">{v.code}</span>
                           {v.operation_id && ` · ${titulos.get(v.operation_id) || v.operation_id}`}
-                          {v.worker_id && ` · ${v.worker_id}`}
+                          {v.worker_id && ` · ${nomeDoTecnico(v.worker_id)}`}
                         </li>
                       ))}
                     </ul>

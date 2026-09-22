@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { quemSalvo } from '@/lib/api';
 import type { Mudanca } from '@/lib/reordenar';
+import { nomeDoTecnico } from '@/lib/rotulos';
 
 export type Pendencia = {
   tecnico: string;
@@ -57,7 +58,7 @@ function LinhaPendencia({ pendencia, gravando, onRegistrar, onDesfazer }: {
   return (
     <div className="pendencia">
       <div className="pendencia-resumo">
-        <strong>{pendencia.tecnico}</strong> · {quantas}{' '}
+        <strong>{nomeDoTecnico(pendencia.tecnico)}</strong> · {quantas}{' '}
         {quantas === 1 ? 'ordem mudou' : 'ordens mudaram'} de posição
         {pendencia.empurradas > 0 && (
           <>; o horário de {pendencia.empurradas}{' '}

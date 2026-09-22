@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { quemSalvo } from '@/lib/api';
 import { escalaImpossivel, horas, rotuloDia } from '@/lib/semana';
+import { nomeDoTecnico } from '@/lib/rotulos';
 
 export type DestinoDoDia = { worker_id: string; carga: number; escala: number };
 
@@ -88,7 +89,7 @@ export function PopoverRemanejo({
 
       {pessoaFixa ? (
         <p className="popover-destino">
-          Fica com <strong>{para}</strong>
+          Fica com <strong>{nomeDoTecnico(para)}</strong>
           {alvo && (alvo.escala > 0
             ? ` · ${horas(alvo.carga)} de ${horas(alvo.escala)} no dia`
             : ' · sem escala no dia')}
@@ -104,7 +105,7 @@ export function PopoverRemanejo({
           >
             {destinos.map((d) => (
               <option key={d.worker_id} value={d.worker_id}>
-                {d.worker_id}
+                {nomeDoTecnico(d.worker_id)}
                 {d.escala > 0 ? ` · ${horas(d.carga)} de ${horas(d.escala)}` : ' · sem escala no dia'}
               </option>
             ))}
@@ -147,22 +148,22 @@ export function PopoverRemanejo({
 
       {alvo && (estoura || semEscala || escalaImpossivel(alvo.escala)) && (
         <div className="note" data-tone="bad">
-          {semEscala && <>{alvo.worker_id} não tem escala declarada em {rotuloDestino}.</>}
+          {semEscala && <>{nomeDoTecnico(alvo.worker_id)} não tem escala declarada em {rotuloDestino}.</>}
           {estoura && (
             <>
-              {alvo.worker_id} fica com {horas(depois)} num dia de {horas(alvo.escala)} de escala —
+              {nomeDoTecnico(alvo.worker_id)} fica com {horas(depois)} num dia de {horas(alvo.escala)} de escala —
               {' '}{horas(depois - alvo.escala)} acima.
             </>
           )}
           {!estoura && !semEscala && escalaImpossivel(alvo.escala) && (
-            <>A escala declarada de {alvo.worker_id} é de {horas(alvo.escala)}, que nenhuma jornada fecha.</>
+            <>A escala declarada de {nomeDoTecnico(alvo.worker_id)} é de {horas(alvo.escala)}, que nenhuma jornada fecha.</>
           )}
         </div>
       )}
 
       {dividida && alvo && (
         <div className="note" data-tone="bad">
-          Esta ordem tem mais de um executante; mover deixa ela com {alvo.worker_id}.
+          Esta ordem tem mais de um executante; mover deixa ela com {nomeDoTecnico(alvo.worker_id)}.
         </div>
       )}
 

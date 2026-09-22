@@ -3,7 +3,7 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { CartaoOrdem } from '@/components/quadro/CartaoOrdem';
 import { horas } from '@/lib/semana';
 import type { Coluna } from '@/lib/quadro';
-import { CAUSA } from '@/lib/rotulos';
+import { CAUSA, nomeDoTecnico } from '@/lib/rotulos';
 import type { Remanejo } from '@/lib/remanejos';
 import type { MarcasDaRevisao } from '@/lib/revisao';
 import type { Troca } from '@/lib/trocas';
@@ -48,6 +48,7 @@ export function ColunaTecnico({
   onArrastarFim: () => void;
   onTeclado: (operationId: string, posicao: number, event: KeyboardEvent) => void;
 }) {
+  const nome = nomeDoTecnico(coluna.tecnico);
   const recebidas = new Set(trocas.map((t) => t.operation_id));
   const vindasDeOutroDia = new Set(remanejos.map((r) => r.operation_id));
   const preenchimento = coluna.escala > 0
@@ -61,7 +62,7 @@ export function ColunaTecnico({
       className="coluna"
       data-alvo={recebendo ? 'sim' : undefined}
       data-indisponivel={coluna.indisponivel ? 'sim' : undefined}
-      aria-label={`Dia de ${coluna.tecnico}`}
+      aria-label={`Dia de ${nome}`}
       onDragOver={(event) => {
         if (!arraste || coluna.indisponivel) return;
         event.preventDefault();
@@ -75,11 +76,11 @@ export function ColunaTecnico({
     >
       <header className="coluna-cabeca">
         <div className="coluna-nome-linha">
-          <div className="coluna-nome">{coluna.tecnico}</div>
+          <div className="coluna-nome">{nome}</div>
           <button
             type="button"
             className="acao-tecnico"
-            aria-label={`Marcar ${coluna.tecnico} como indisponível`}
+            aria-label={`Marcar ${nome} como indisponível`}
             title="Marcar indisponível"
             onClick={onMarcarIndisponivel}
           >

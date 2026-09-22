@@ -19,6 +19,7 @@ import {
   semanaRevisada, trocasDaRevisao, type MarcasDaRevisao,
 } from '@/lib/revisao';
 import { motivoDoFeedback } from '@/lib/trocas';
+import { nomesDosTecnicos } from '@/lib/rotulos';
 import { dia, hhmm, hora, type Backlog, type Run, type Schedule, type Verification } from '@/lib/api';
 
 const SEM_FILTRO: FiltroSemana = { busca: '', soEstouro: false, local: '' };
@@ -351,7 +352,7 @@ export function Semana({ run, schedule, backlog, verification, revisor, onVerVio
                 >
                   <td className="mono" title={a.work_order_id}>{a.work_order_id.slice(-6)}</td>
                   <td>{indice.titulos.get(a.operation_id) ?? '—'}</td>
-                  <td className="mono">{a.worker_ids.join(', ')}</td>
+                  <td className="mono">{nomesDosTecnicos(a.worker_ids)}</td>
                   <td>{dia(a.window.start)}</td>
                   <td className="mono">{hora(a.window.start)}–{hora(a.window.end)}</td>
                   <td className="num">{a.priority_score.toFixed(0)}</td>

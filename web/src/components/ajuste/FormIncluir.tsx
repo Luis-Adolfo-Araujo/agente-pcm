@@ -1,6 +1,7 @@
 'use client';
 import type { LinhaDestino } from '@/lib/destinos';
 import type { Escolha } from '@/lib/pedidos';
+import { nomeDoTecnico } from '@/lib/rotulos';
 import { horas, rotuloDia } from '@/lib/semana';
 
 /**
@@ -49,7 +50,7 @@ export function FormIncluir({ dias, destinos, escolha, onEscolher, minutos, prec
               {destinos.map((linha) => (
                 <tr key={linha.worker_id} data-elegivel={linha.eligible ? undefined : 'nao'}>
                   <th scope="row">
-                    <span className="mono">{linha.worker_id}</span>
+                    <span className="mono">{nomeDoTecnico(linha.worker_id)}</span>
                     <span className="grade-nota">
                       {linha.eligible
                         ? `score ${linha.score.toFixed(0)}`

@@ -5,6 +5,7 @@ import { DetalheOrdem } from '@/components/detalhe/DetalheOrdem';
 import { TrocarTecnico, type Destino } from '@/components/detalhe/TrocarTecnico';
 import type { Pedido } from '@/components/sessao/useRevisao';
 import { REASON_NAMES, hora, type Backlog, type Schedule } from '@/lib/api';
+import { nomesDosTecnicos } from '@/lib/rotulos';
 import { carga, diaDe, escalaDoDia, minutosDe, tecnicosComEscala, type Indice } from '@/lib/semana';
 import { trocaDaOrdem, type Troca } from '@/lib/trocas';
 
@@ -103,7 +104,7 @@ export function DetalheModal({
           </button>
           <h2 className="detalhe-titulo">Passar para outra pessoa</h2>
           <div className="detalhe-marcas">
-            <Badge tone="good">hoje com {alocada.worker_ids.join(', ')}</Badge>
+            <Badge tone="good">hoje com {nomesDosTecnicos(alocada.worker_ids)}</Badge>
             <span className="detalhe-nota">
               {hora(alocada.window.start)}–{hora(alocada.window.end)} · {minutosDe(alocada)} min
             </span>
@@ -131,7 +132,7 @@ export function DetalheModal({
         <div className="detalhe-marcas">
           {fora
             ? <Badge tone="bad">fora da semana · {REASON_NAMES[fora.reason] ?? fora.reason}</Badge>
-            : alocada && <Badge tone="good">{alocada.worker_ids.join(', ')}</Badge>}
+            : alocada && <Badge tone="good">{nomesDosTecnicos(alocada.worker_ids)}</Badge>}
           {troca && <Badge tone="warn">passada por você</Badge>}
           <span className="detalhe-nota">
             {alocada && `${hora(alocada.window.start)}–${hora(alocada.window.end)} · `}

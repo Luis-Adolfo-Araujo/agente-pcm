@@ -1,6 +1,42 @@
 /** Os nomes que o backend usa não são nomes de gente. Aqui é onde eles viram. */
 import type { Causa, TipoDeAjuste } from '@/lib/api';
 
+const PRIMEIROS_NOMES = [
+  'Carlos', 'Adriana', 'Marcos', 'Juliana', 'Rogério', 'Patrícia', 'Anderson', 'Simone',
+];
+const SOBRENOMES = [
+  'Medeiros', 'Barbosa', 'Nogueira', 'Cavalcanti', 'Siqueira', 'Rezende', 'Albuquerque', 'Fontes',
+];
+
+/** Dá nome às pessoas fictícias da demonstração sem alterar o id usado pela API. */
+export function nomeDoTecnico(workerId: string): string {
+  const correspondencia = /^tecnico-(\d{2})$/.exec(workerId);
+  if (!correspondencia) return workerId;
+  const indice = Number(correspondencia[1]) - 1;
+  if (indice < 0 || indice >= PRIMEIROS_NOMES.length * SOBRENOMES.length) return workerId;
+  return `${PRIMEIROS_NOMES[indice % PRIMEIROS_NOMES.length]} ${SOBRENOMES[Math.floor(indice / PRIMEIROS_NOMES.length)]}`;
+}
+
+export function nomesDosTecnicos(workerIds: string[]): string {
+  return workerIds.map(nomeDoTecnico).join(', ');
+}
+
+/** Mantém juntas, sem confundir, a identidade da API e a identidade apresentada. */
+export function identidadeDoTecnico(workerId: string): { id: string; nome: string } {
+  return { id: workerId, nome: nomeDoTecnico(workerId) };
+}
+
+/** Formata a cópia mostrada nos painéis técnicos; o payload original não é alterado. */
+export function jsonComNomesDosTecnicos(value: unknown): string {
+  return JSON.stringify(value, (chave, item: unknown) => {
+    if (chave.endsWith('worker_id') && typeof item === 'string') return nomeDoTecnico(item);
+    if (chave.endsWith('worker_ids') && Array.isArray(item)) {
+      return item.map((workerId) => typeof workerId === 'string' ? nomeDoTecnico(workerId) : workerId);
+    }
+    return item;
+  }, 2);
+}
+
 export const FONTE: Record<string, string> = {
   planned: 'duração planejada da OS',
   same_activity_and_asset: 'histórico: mesma atividade e ativo',

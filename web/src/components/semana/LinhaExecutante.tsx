@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react';
 import { CelulaDia } from '@/components/semana/CelulaDia';
 import { ordensVisiveis, type LinhaSemana } from '@/lib/matriz';
+import { nomeDoTecnico } from '@/lib/rotulos';
 import type { MarcasDaRevisao } from '@/lib/revisao';
 import { horas } from '@/lib/semana';
 
@@ -43,6 +44,7 @@ export function LinhaExecutante({
   onSair: (dia: string) => void;
   onSoltar: (dia: string) => void;
 }) {
+  const nome = nomeDoTecnico(linha.tecnico);
   const visiveis = ordensVisiveis(linha);
   const semanaVazia = linha.escala === 0;
   const preenchimento = linha.ocupacao === null
@@ -62,12 +64,12 @@ export function LinhaExecutante({
           <svg className="pessoa-chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
             <path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span className="pessoa-nome">{linha.tecnico}</span>
+          <span className="pessoa-nome">{nome}</span>
         </button>
         <button
           type="button"
           className="acao-tecnico"
-          aria-label={`Marcar ${linha.tecnico} como indisponível`}
+          aria-label={`Marcar ${nome} como indisponível`}
           title="Marcar indisponível"
           onClick={onMarcarIndisponivel}
         >

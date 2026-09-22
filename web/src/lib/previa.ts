@@ -1,4 +1,5 @@
 import type { Consequencia, Lugar, Previa, RascunhoDeAjuste } from '@/lib/api';
+import { nomesDosTecnicos } from '@/lib/rotulos';
 import { rotuloDia } from '@/lib/semana';
 
 /** Para onde a consequência leva a ordem, depois da escolha de quem revisa. */
@@ -34,5 +35,5 @@ export function resumoDasConsequencias(previa: Previa): string {
 export function descreverLugar(lugar: Lugar | null): string {
   if (!lugar) return 'fora da semana';
   const { nome, numero } = rotuloDia(lugar.date);
-  return `${nome} ${numero} ${lugar.start.slice(11, 16)} ${lugar.worker_ids.join(', ')}`;
+  return `${nome} ${numero} ${lugar.start.slice(11, 16)} ${nomesDosTecnicos(lugar.worker_ids)}`;
 }

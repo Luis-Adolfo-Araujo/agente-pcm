@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { quemSalvo } from '@/lib/api';
 import { escalaImpossivel, horas } from '@/lib/semana';
+import { nomeDoTecnico } from '@/lib/rotulos';
 import type { Pedido } from '@/components/sessao/useRevisao';
 
 export type Destino = {
@@ -59,7 +60,7 @@ export function TrocarTecnico({ de, duracao, destinos, inicial, gravando, erro, 
   return (
     <div className="troca">
       <p className="muted" style={{ marginTop: 0 }}>
-        Hoje ela é de <strong>{de}</strong>. Quem recebe, e por quê.
+        Hoje ela é de <strong>{nomeDoTecnico(de)}</strong>. Quem recebe, e por quê.
       </p>
 
       <div className="troca-campos">
@@ -68,7 +69,7 @@ export function TrocarTecnico({ de, duracao, destinos, inicial, gravando, erro, 
           <select id="troca-para" value={para} onChange={(e) => setPara(e.target.value)}>
             {destinos.map((d) => (
               <option key={d.worker_id} value={d.worker_id}>
-                {d.worker_id}
+                {nomeDoTecnico(d.worker_id)}
                 {d.score !== null ? ` · score ${d.score.toFixed(0)}` : ' · não avaliado'}
                 {d.eligible === false ? ' · inelegível' : ''}
                 {d.escala > 0 ? ` · ${horas(d.carga)} de ${horas(d.escala)}` : ' · sem escala no dia'}
@@ -102,15 +103,15 @@ export function TrocarTecnico({ de, duracao, destinos, inicial, gravando, erro, 
 
       {alvo && (estoura || semEscala || escalaImpossivel(alvo.escala)) && (
         <div className="note" data-tone="bad" style={{ marginTop: 'var(--space-md)' }}>
-          {semEscala && <>{alvo.worker_id} não tem escala declarada neste dia.</>}
+          {semEscala && <>{nomeDoTecnico(alvo.worker_id)} não tem escala declarada neste dia.</>}
           {estoura && (
             <>
-              {alvo.worker_id} fica com {horas(depois)} num dia de {horas(alvo.escala)} de escala —
+              {nomeDoTecnico(alvo.worker_id)} fica com {horas(depois)} num dia de {horas(alvo.escala)} de escala —
               {' '}{horas(depois - alvo.escala)} acima.
             </>
           )}
           {!estoura && !semEscala && escalaImpossivel(alvo.escala) && (
-            <>A escala declarada de {alvo.worker_id} é de {horas(alvo.escala)}, que nenhuma jornada fecha.</>
+            <>A escala declarada de {nomeDoTecnico(alvo.worker_id)} é de {horas(alvo.escala)}, que nenhuma jornada fecha.</>
           )}
           {' '}A troca é registrada mesmo assim; a conferência dura continua valendo sobre a proposta do agente.
         </div>
@@ -132,7 +133,7 @@ export function TrocarTecnico({ de, duracao, destinos, inicial, gravando, erro, 
           disabled={!pronto}
           onClick={() => onConfirmar({ de, para, motivo, quem })}
         >
-          {gravando ? 'Registrando…' : `Passar para ${para}`}
+          {gravando ? 'Registrando…' : `Passar para ${nomeDoTecnico(para)}`}
         </button>
       </div>
     </div>

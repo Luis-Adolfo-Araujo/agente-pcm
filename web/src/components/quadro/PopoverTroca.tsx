@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { quemSalvo } from '@/lib/api';
+import { nomeDoTecnico } from '@/lib/rotulos';
 import { escalaImpossivel, horas } from '@/lib/semana';
 
 /**
@@ -41,11 +42,11 @@ export function PopoverTroca({
     <div
       className="popover-troca"
       role="dialog"
-      aria-label={`Passar de ${de} para ${para}`}
+      aria-label={`Passar de ${nomeDoTecnico(de)} para ${nomeDoTecnico(para)}`}
       onKeyDown={(event) => { if (event.key === 'Escape') onCancelar(); }}
     >
       <p className="popover-titulo">
-        <strong>{de}</strong> → <strong>{para}</strong>
+        <strong>{nomeDoTecnico(de)}</strong> → <strong>{nomeDoTecnico(para)}</strong>
       </p>
 
       <div className="field">
@@ -73,15 +74,15 @@ export function PopoverTroca({
 
       {(estoura || semEscala || escalaImpossivel(escalaDestino)) && (
         <div className="note" data-tone="bad">
-          {semEscala && <>{para} não tem escala declarada neste dia.</>}
+          {semEscala && <>{nomeDoTecnico(para)} não tem escala declarada neste dia.</>}
           {estoura && (
             <>
-              {para} fica com {horas(depois)} num dia de {horas(escalaDestino)} de escala —
+              {nomeDoTecnico(para)} fica com {horas(depois)} num dia de {horas(escalaDestino)} de escala —
               {' '}{horas(depois - escalaDestino)} acima.
             </>
           )}
           {!estoura && !semEscala && escalaImpossivel(escalaDestino) && (
-            <>A escala declarada de {para} é de {horas(escalaDestino)}, que nenhuma jornada fecha.</>
+            <>A escala declarada de {nomeDoTecnico(para)} é de {horas(escalaDestino)}, que nenhuma jornada fecha.</>
           )}
         </div>
       )}
@@ -103,7 +104,7 @@ export function PopoverTroca({
           disabled={gravando || quem.trim().length === 0}
           onClick={() => onConfirmar(quem, motivo)}
         >
-          {gravando ? 'Registrando…' : `Passar para ${para}`}
+          {gravando ? 'Registrando…' : `Passar para ${nomeDoTecnico(para)}`}
         </button>
       </div>
     </div>

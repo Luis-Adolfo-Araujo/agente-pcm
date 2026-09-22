@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { Badge, Table } from '@/components/ui';
-import { BANDA, FONTE, MATERIAL } from '@/lib/rotulos';
+import { BANDA, FONTE, MATERIAL, jsonComNomesDosTecnicos, nomeDoTecnico } from '@/lib/rotulos';
 import {
   REASON_NAMES,
   SKILLS_PARALELAS,
@@ -107,8 +107,8 @@ function TabelaOrdens({ itens, coluna, valor, bruto }: {
             <td>{item.scheduled ? <Badge tone="good">sim</Badge> : <Badge tone="mute">não</Badge>}</td>
             <td>
               <details className="trace-json">
-                <summary>saída crua</summary>
-                <pre>{JSON.stringify(bruto(item), null, 2)}</pre>
+                <summary>detalhe técnico</summary>
+                <pre>{jsonComNomesDosTecnicos(bruto(item))}</pre>
               </details>
             </td>
           </tr>
@@ -253,7 +253,7 @@ export function Trace({ run, snapshot, backlog, schedule, verification }: {
       <p className="muted" style={{ maxWidth: '68ch' }}>
         Cada etapa abaixo é uma execução real desta run: o tempo vem do trace, os números vêm da
         saída da skill. Clique numa faixa para ver as ordens que caíram naquele caso, e abra
-        “saída crua” para o JSON que a skill devolveu.
+        “detalhe técnico” para o JSON que a skill devolveu, com nomes na apresentação.
       </p>
 
       <ol className="trace">
@@ -345,14 +345,14 @@ export function Trace({ run, snapshot, backlog, schedule, verification }: {
                 <Table head={<><th>Pessoa</th><th className="num">Bruto</th><th className="num">Comprometido</th><th className="num">Líquido</th><th /></>}>
                   {backlog.capacities.map((c) => (
                     <tr key={c.worker_id}>
-                      <td className="mono">{c.worker_id}</td>
+                      <td className="mono">{nomeDoTecnico(c.worker_id)}</td>
                       <td className="num">{hhmm(c.gross_minutes)}</td>
                       <td className="num">{hhmm(c.committed_minutes)}</td>
                       <td className="num">{hhmm(c.net_minutes)}</td>
                       <td>
                         <details className="trace-json">
-                          <summary>saída crua</summary>
-                          <pre>{JSON.stringify(c, null, 2)}</pre>
+                          <summary>detalhe técnico</summary>
+                          <pre>{jsonComNomesDosTecnicos(c)}</pre>
                         </details>
                       </td>
                     </tr>
@@ -377,7 +377,7 @@ export function Trace({ run, snapshot, backlog, schedule, verification }: {
             <TabelaOrdens
               itens={selecionados('executante', executantes)}
               coluna="Melhor candidato"
-              valor={(item) => (item.executants[0] ? `${item.executants[0].worker_id} · ${item.executants[0].score.toFixed(0)}` : '—')}
+              valor={(item) => (item.executants[0] ? `${nomeDoTecnico(item.executants[0].worker_id)} · ${item.executants[0].score.toFixed(0)}` : '—')}
               bruto={(item) => item.executants}
             />
           )}

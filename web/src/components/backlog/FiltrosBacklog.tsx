@@ -3,7 +3,7 @@ import { REASON_NAMES } from '@/lib/api';
 import {
   SEM_FILTRO_BACKLOG, filtrando, type FiltroBacklog, type OpcoesDoBacklog,
 } from '@/lib/filtroBacklog';
-import { BANDA, MATERIAL } from '@/lib/rotulos';
+import { BANDA, MATERIAL, nomeDoTecnico } from '@/lib/rotulos';
 
 /**
  * O recorte do backlog. Cada seletor só aparece quando há o que escolher, e só
@@ -63,7 +63,7 @@ export function FiltrosBacklog({ filtro, opcoes, onMudar, resultado }: {
       </div>
       <Seletor
         id="backlog-tecnico" rotulo="Técnico candidato" valor={filtro.tecnico} opcoes={opcoes.tecnicos}
-        nome={(t) => t} onMudar={(tecnico) => mudar({ tecnico })}
+        nome={nomeDoTecnico} onMudar={(tecnico) => mudar({ tecnico })}
       />
       <button
         type="button"
