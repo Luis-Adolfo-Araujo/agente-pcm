@@ -30,11 +30,6 @@ config/tenants/        os parâmetros de uma planta
 scripts/               congelamento dos artefatos da demonstração
 ```
 
-A anatomia `H = (E, T, C, S, L, V)` que o runtime persegue está no cabeçalho de
-[`src/agent/__init__.py`](src/agent/__init__.py). O que está versionado é a fatia
-dela que o Agente Programador exercita; o resto é ponto de extensão em aberto, e
-não um esqueleto de arquivos vazios no repositório.
-
 ## As skills
 
 | Skill | O que decide |
