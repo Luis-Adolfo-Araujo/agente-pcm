@@ -1,1 +1,0 @@
-# qual subconjunto o modelo vê neste turno

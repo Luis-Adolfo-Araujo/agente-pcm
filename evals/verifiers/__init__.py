@@ -1,1 +1,0 @@
-# como cada caso é julgado

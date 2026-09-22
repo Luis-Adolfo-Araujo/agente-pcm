@@ -1,1 +1,0 @@
-#  orçamento, laço, sucesso verificável

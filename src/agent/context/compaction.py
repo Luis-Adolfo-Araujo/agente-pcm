@@ -1,1 +1,0 @@
-# o que vira resumo e quando

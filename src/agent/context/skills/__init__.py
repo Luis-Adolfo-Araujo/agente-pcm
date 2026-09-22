@@ -1,1 +1,0 @@
-# instruções curadas, versionadas

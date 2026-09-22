@@ -9,16 +9,15 @@ A árvore separa:
 2. runtime do agente segundo `H = (E, T, C, S, L, V)`;
 3. plataforma operacional, integrações e entrega confiável.
 
-Comece por [`guidelines/architecture.md`](guidelines/architecture.md). Os arquivos
-vazios ou contendo apenas comentários representam contratos e pontos de extensão a
-serem implementados conforme o domínio do projeto.
+Comece por [`guidelines/architecture.md`](guidelines/architecture.md), que descreve
+a arquitetura de referência completa. O código versionado aqui cobre a fatia dela que
+o Agente Programador já exercita; o resto do desenho é ponto de extensão em aberto, e
+não um esqueleto de arquivos vazios no repositório.
 
 Documentos complementares:
 
-- `guidelines/implementation_order.md`: sequência sugerida de construção;
-- `guidelines/verificador.md`: verificação em runtime e offline;
-- `guidelines/funcionalidades.md`: exemplo de escopo positivo;
-- `guidelines/nao_faz.md`: exemplo de limites e escalonamento.
+- [`guidelines/implementation_order.md`](guidelines/implementation_order.md): sequência sugerida de construção;
+- [`guidelines/ebook-construindo-agentes.md`](guidelines/ebook-construindo-agentes.md): fundamentação de harness, contexto, ferramentas e verificação.
 
 ## Agente Programador de PCM
 

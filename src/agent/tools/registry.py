@@ -1,1 +1,0 @@
-# catálogo, descrições, validação

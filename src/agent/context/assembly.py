@@ -1,1 +1,0 @@
-#  o que entra na janela, nessa ordem

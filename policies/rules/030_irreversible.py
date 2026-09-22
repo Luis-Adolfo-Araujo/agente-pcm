@@ -1,1 +1,0 @@
-# exige portão humano

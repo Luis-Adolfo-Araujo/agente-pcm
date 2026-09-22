@@ -1,1 +1,0 @@
-# o que volta da API pode entrar no contexto?

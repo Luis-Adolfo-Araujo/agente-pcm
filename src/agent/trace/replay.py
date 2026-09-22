@@ -1,1 +1,0 @@
-# reconstruir uma execução passada

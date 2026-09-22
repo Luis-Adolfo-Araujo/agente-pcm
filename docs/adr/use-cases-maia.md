@@ -1,6 +1,6 @@
 # Casos de Uso MAIA — Agente de PCM
 
-As histórias abaixo consolidam as capacidades comuns identificadas nos levantamentos da M. Dias Branco e da Planta Modelo. A numeração segue a ordem estimada de impacto no PCM industrial, considerando redução de esforço manual, qualidade da programação, aderência ao plano e redução de retrabalho.
+As histórias abaixo consolidam as capacidades comuns identificadas nos levantamentos de campo em duas plantas industriais. A numeração segue a ordem estimada de impacto no PCM industrial, considerando redução de esforço manual, qualidade da programação, aderência ao plano e redução de retrabalho.
 
 US-01 — Geração automática da programação do período
 

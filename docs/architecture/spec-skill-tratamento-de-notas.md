@@ -9,9 +9,9 @@ sugerindo duplicidade, tipo de nota e prioridade para um lote de notas, sem
 decidir nada sozinha e sem contaminar o caminho determinístico do Agente
 Programador.
 
-O processo de referência é o mapa do M. Dias Branco (`docs/adr/use-cases-mdiasbranco.md`,
-Épico 1 — Porteiro Inteligente). A intenção declarada é unificar esse processo
-para Planta Modelo e Stellantis.
+O processo de referência é o mapa de uma planta industrial de grande porte
+(Épico 1 — Porteiro Inteligente). A intenção declarada é unificar esse processo
+entre as plantas atendidas.
 
 ## 2. Escopo da primeira versão
 

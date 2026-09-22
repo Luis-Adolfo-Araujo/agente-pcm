@@ -1,1 +1,0 @@
-#  contratos, um arquivo por ferramenta
