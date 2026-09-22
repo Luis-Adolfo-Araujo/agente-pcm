@@ -1,41 +1,71 @@
-# Agent Base Worktree
+# Agente Programador de PCM
 
-Arquitetura de referência para visualizar as responsabilidades de um projeto de
-agentes de IA robusto e operável em produção.
+Monta a programação semanal de manutenção de uma planta industrial: lê o backlog
+de ordens, decide o que cabe na semana, para quem vai e em que dia — e diz, ordem
+por ordem, por que cada uma que ficou de fora ficou de fora.
 
-A árvore separa:
+**Nenhuma decisão numérica depende de LLM.** Ranking, duração, material,
+capacidade e alocação saem de skills determinísticas sobre um snapshot congelado.
+Um verificador independente confere a proposta pronta, e nada vira programação
+sem um humano aprovar — uma proposta inválida não pode ser aprovada.
 
-1. domínio e casos de uso do produto;
-2. runtime do agente segundo `H = (E, T, C, S, L, V)`;
-3. plataforma operacional, integrações e entrega confiável.
+Para ver funcionando, sobre uma planta que não existe:
+<https://luis-adolfo-araujo.github.io/agente-pcm/>
 
-A anatomia `H` que o runtime persegue está descrita em
-[`src/agent/__init__.py`](src/agent/__init__.py). O código versionado aqui cobre a
-fatia dela que o Agente Programador já exercita; o resto do desenho é ponto de
-extensão em aberto, e não um esqueleto de arquivos vazios no repositório.
+## O que tem aqui
 
-## Agente Programador de PCM
+```
+src/agent/skills/      as skills, uma pasta por competência
+src/agent/programmer/  o otimizador guloso e o verificador
+src/agent/trace/       o registro do que a rodada fez, em JSONL
+src/domain/planning/   ordens, técnicos, capacidade, janela
+src/domain/notes/      notas de manutenção, antes de virarem ordem
+src/application/       CLI, workflows e a camada de serviço
+src/infrastructure/    adaptador Tractian, somente leitura
+src/api/               a API HTTP que a interface consome
+src/presentation/      o piloto Streamlit, a primeira tela
+web/                   a interface de programação, em Next.js
+demo/                  o snapshot inventado da demonstração
+config/tenants/        os parâmetros de uma planta
+scripts/               congelamento dos artefatos da demonstração
+```
 
-O primeiro incremento offline está implementado com:
+A anatomia `H = (E, T, C, S, L, V)` que o runtime persegue está no cabeçalho de
+[`src/agent/__init__.py`](src/agent/__init__.py). O que está versionado é a fatia
+dela que o Agente Programador exercita; o resto é ponto de extensão em aberto, e
+não um esqueleto de arquivos vazios no repositório.
 
-- ranking de backlog;
-- estimativa de duração;
-- disponibilidade de materiais;
-- capacidade líquida;
-- sugestão de executantes;
-- otimizador guloso determinístico;
-- verificador independente;
-- gate de aprovação humana;
-- adaptador Tractian somente leitura.
+## As skills
 
-As quatro primeiras skills independentes são executadas em paralelo. A skill de
-executantes consome duração e capacidade, e o otimizador recebe apenas contratos
-estruturados. Nenhuma decisão numérica depende de LLM.
+| Skill | O que decide |
+|---|---|
+| [`rank-backlog`](src/agent/skills/pcm/rank-backlog/SKILL.md) | a ordem do backlog, por prioridade informada, idade, SLA e criticidade |
+| [`estimate-duration`](src/agent/skills/pcm/estimate-duration/SKILL.md) | quanto tempo cada operação leva, com confiança e fallback explícitos |
+| [`check-materials`](src/agent/skills/pcm/check-materials/SKILL.md) | disponível, parcial, indisponível ou desconhecido — sem confundir falta de saldo com falta de cadastro |
+| [`calculate-capacity`](src/agent/skills/pcm/calculate-capacity/SKILL.md) | a capacidade líquida por pessoa, descontando escala, ausências e compromissos |
+| [`suggest-executants`](src/agent/skills/pcm/suggest-executants/SKILL.md) | quem são os candidatos a executar, e em que ordem |
+| [`treat-notes`](src/agent/skills/notes/treat-notes/SKILL.md) | duplicidade, tipo e prioridade de um lote de notas, antes da ordem existir |
+
+As quatro primeiras são independentes e rodam em paralelo. A de executantes
+consome duração e capacidade. O otimizador recebe apenas contratos estruturados,
+nunca texto livre, e o adaptador Tractian nunca escreve.
+
+`treat-notes` fica fora do workflow de programação: trata o que chega antes dele.
+
+## Rodar o agente
 
 ### Preparar o ambiente
 
 ```bash
 uv sync --extra dev
+```
+
+Não há `uv.lock` versionado. Para levantar só a API da demonstração, sem o resto,
+`requirements.txt` fixa as versões verificadas — `psycopg` e o extra `pilot`
+ficam de fora de propósito, porque a demonstração lê arquivo e nunca abre banco:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ### Extrair um snapshot atual da Tractian
@@ -139,19 +169,11 @@ O feedback coletado nas sessões alimenta a avaliação offline das skills:
 ```bash
 uv run maia-pcm export-golden-set \
   --db var/pilot/pilot.sqlite3 \
-  --output evals/datasets/golden-set.jsonl
+  --output var/pilot/golden-set.jsonl
 ```
 
 O arquivo carrega snapshot, operação, skill, veredito e motivo. A identidade de
 quem avaliou permanece no banco do piloto e não entra no conjunto de dados.
-
-### Validar
-
-```bash
-uv run pytest
-uv run ruff check src tests
-uv run mypy src tests
-```
 
 ## Demonstração pública
 
@@ -222,3 +244,11 @@ toda rota que não seja `/api/health`.
 
 Os executantes aparecem com o identificador cru (`tecnico-07`) porque são
 fictícios: o pseudônimo esconderia um dado que não existe.
+
+## Validar
+
+```bash
+uv run pytest
+uv run ruff check src tests
+uv run mypy src tests
+```
